@@ -1,6 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import React, { useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
+import { useControl } from "react-three-gui";
 import { useMount } from "../utils/hooks";
 
 const SPEED_Y = 0.5;
@@ -46,12 +47,26 @@ export default function SpinningParticle() {
   useMount(() => {
     setMounted(true);
   });
+
+  const [zoomedIn, setZoomedIn] = useState(false);
+  const handleZoomIn = () => setZoomedIn(true);
+
+  console.log("🌟🚨 ~ SpinningParticle ~ zoomedIn", zoomedIn);
+
+  const finalScale = useControl("finalScale", {
+    type: "number",
+    min: 3,
+    max: 100,
+    value: 10,
+  });
+  const scale = zoomedIn ? finalScale : mounted ? 1 : 0;
+
   const springProps = useSpring({
-    scale: [mounted ? 1 : 0, mounted ? 1 : 0, mounted ? 1 : 0],
+    scale: [scale, scale, scale],
     config: {
       mass: 20,
       tension: 30,
-      friction: 20,
+      friction: 14,
       clamp: false,
     },
     // // unmount the particle when it's fully decayed
@@ -69,7 +84,11 @@ export default function SpinningParticle() {
   });
 
   return (
-    <animated.mesh scale={springProps.scale}>
+    <animated.mesh
+      scale={springProps.scale}
+      onClick={handleZoomIn}
+      onPointerDown={handleZoomIn}
+    >
       <mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <meshPhysicalMaterial

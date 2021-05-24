@@ -32,6 +32,7 @@
     "react-helmet": "^6.1.0",
     "react-spring": "^9.1.2",
     "react-three-fiber": "^6.0.13",
+    "react-three-gui": "^0.4.2",
     "styled-components": "^5.3.0",
     "three": "^0.128.0",
     "zustand": "^3.5.1"
