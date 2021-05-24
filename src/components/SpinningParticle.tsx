@@ -1,5 +1,7 @@
 import { useFrame } from "@react-three/fiber";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useSpring, animated } from "react-spring/three";
+import { useMount } from "../utils/hooks";
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
@@ -39,8 +41,35 @@ export default function SpinningParticle() {
     ref5.current.rotation.y =
       ref5.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
   });
+
+  const [mounted, setMounted] = useState(false);
+  useMount(() => {
+    setMounted(true);
+  });
+  const springProps = useSpring({
+    scale: [mounted ? 1 : 0, mounted ? 1 : 0, mounted ? 1 : 0],
+    config: {
+      mass: 20,
+      tension: 30,
+      friction: 20,
+      clamp: false,
+    },
+    // // unmount the particle when it's fully decayed
+    // onRest: (spring) => {
+    //   const isDecayed = spring.scale[0] === 0;
+    //   // TODO: if type === PROTEIN_TYPES.antibody
+    //   // TODO: else if type === PROTEIN_TYPES.virus
+    //   if (isDecayed) {
+    //     if (type === PROTEIN_TYPES.virus) {
+    //       incrementNumDefeatedViruses();
+    //     }
+    //     unmount();
+    //   }
+    // },
+  });
+
   return (
-    <>
+    <animated.mesh scale={springProps.scale}>
       <mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <meshPhysicalMaterial
@@ -132,6 +161,6 @@ export default function SpinningParticle() {
           wireframe={true}
         />
       </mesh>
-    </>
+    </animated.mesh>
   );
 }
