@@ -32,6 +32,7 @@ type GlobalStateType = {
   showHp: boolean;
   /** has the app been started */
   started: boolean;
+  isSpinning: boolean;
   /** is the game paused / temperature === 0 */
   paused: boolean;
   /** if a property in the store is animating e.g. scale, can turn things on/off */
@@ -67,6 +68,9 @@ export const INITIAL_PLAYER_HP = 4000;
 export const INITIAL_CEILING_HEIGHT = 10;
 
 export function getSettingsFromLS() {
+  if (typeof window === "undefined") {
+    return;
+  }
   const settings = window.localStorage.getItem("settings");
   return JSON.parse(settings);
 }
@@ -81,6 +85,7 @@ const initialSoundOn = (() => {
 export const useStore = create<GlobalStateType>(
   (set): GlobalStateType => ({
     isTooltipMaximized: false,
+    isSpinning: false,
     paused: false,
     soundOn: initialSoundOn,
     isPropertyAnimating: false,
