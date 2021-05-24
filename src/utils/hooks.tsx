@@ -4,6 +4,35 @@ function getIsSSR() {
   return typeof window === "undefined";
 }
 
+// https://hooks-guide.netlify.app/rehooks/useDeviceOrientation
+export function useDeviceOrientation() {
+  const [deviceOrientation, setDeviceOrientation] = useState({
+    absolute: false,
+    alpha: null as number | null,
+    beta: null as number | null,
+    gamma: null as number | null,
+  });
+
+  function handleDeviceOrientation(event) {
+    setDeviceOrientation({
+      absolute: event.absolute,
+      alpha: event.alpha,
+      beta: event.beta,
+      gamma: event.gamma,
+    });
+  }
+
+  useEffect(() => {
+    window.addEventListener("deviceorientation", handleDeviceOrientation, true);
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleDeviceOrientation);
+    };
+  }, []);
+
+  return deviceOrientation;
+}
+
 export function useWindowSize() {
   const isSSR = getIsSSR();
 

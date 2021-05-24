@@ -8,14 +8,13 @@ import { Physics } from "@react-three/cannon";
 import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
 import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
-import { ControlsProvider } from "react-three-gui/dist/components/controls-provider";
 import { Controls } from "react-three-gui";
 
 export default function CanvasAndScene() {
   const windowSize = useWindowSize();
 
   return (
-    <ControlsProvider>
+    <Controls.Provider>
       <Controls.Canvas
         onCreated={({ gl }) => {
           // gl.shadowMap.enabled = true;
@@ -35,7 +34,8 @@ export default function CanvasAndScene() {
           </Physics>
         </SpinScene>
       </Controls.Canvas>
-    </ControlsProvider>
+      <Controls />
+    </Controls.Provider>
   );
 }
 

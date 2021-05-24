@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import React, { useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
 import { useControl } from "react-three-gui";
-import { useMount } from "../utils/hooks";
+import { useDeviceOrientation, useMount } from "../utils/hooks";
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
@@ -60,12 +60,14 @@ export default function SpinningParticle() {
     value: 10,
   });
   const scale = zoomedIn ? finalScale : mounted ? 1 : 0;
+  const opacity = zoomedIn ? 0 : 1;
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
+    opacity,
     config: {
       mass: 20,
-      tension: 30,
+      tension: zoomedIn ? 100 : 30,
       friction: 14,
       clamp: false,
     },
@@ -83,12 +85,16 @@ export default function SpinningParticle() {
     // },
   });
 
+  const deviceOrientation = useDeviceOrientation();
+  console.log("🌟🚨 ~ SpinningParticle ~ deviceOrientation", deviceOrientation);
+
   return (
     <animated.mesh
       scale={springProps.scale}
       onClick={handleZoomIn}
       onPointerDown={handleZoomIn}
     >
+      <meshStandardMaterial transparent={true} opacity={springProps.opacity} />
       <mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <meshPhysicalMaterial
