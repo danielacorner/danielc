@@ -1,4 +1,4 @@
-import { Sky, Stars } from "@react-three/drei";
+import { Html, Sky, Stars } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
@@ -91,18 +91,28 @@ export default function SpinningParticle() {
     // },
   });
 
-  const deviceOrientation = useDeviceOrientation();
-  console.log("🌟🚨 ~ SpinningParticle ~ deviceOrientation", deviceOrientation);
-
+  const dOrient = useDeviceOrientation();
+  console.log("🌟🚨 ~ SpinningParticle ~ dOrient", dOrient);
+  const isSupported = window.DeviceOrientationEvent;
   const hourOfDay = new Date().getHours();
-  const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
+  const isDaytime = false;
+  // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
 
   return (
     <animated.mesh
       scale={springProps.scale}
       onClick={handleZoomIn}
       onPointerDown={handleZoomIn}
+      rotation={[(Math.PI * dOrient.alpha) / 360, 0, 0]}
     >
+      <Html>
+        {
+          <div style={{ color: "white", overflowWrap: "anywhere", width: 160 }}>
+            orientation: {JSON.stringify(dOrient)}
+            isSupported: {isSupported}
+          </div>
+        }
+      </Html>
       <Stars />
       <Sky
         distance={450000}
