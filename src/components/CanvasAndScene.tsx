@@ -1,6 +1,7 @@
 import React from "react";
 import { useWindowSize } from "../utils/hooks";
 // import * as THREE from "three";
+import { Sky, Stars } from "@react-three/drei";
 import { Canvas } from "react-three-fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Lighting } from "./Lighting";
@@ -9,11 +10,9 @@ import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
 import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls } from "react-three-gui";
-import { useStore } from "../store";
 
 export default function CanvasAndScene() {
   const windowSize = useWindowSize();
-  const isZoomed = useStore((s) => s.isZoomed);
   return (
     <Controls.Provider>
       <Controls.Canvas
@@ -27,7 +26,7 @@ export default function CanvasAndScene() {
       >
         <Lighting />
         <SpinScene>
-          {!isZoomed && <OrbitControls />}
+          {process.env.NODE_ENV === "development" && <OrbitControls />}
           <Physics {...PHYSICS_PROPS}>
             <mesh scale={[1, 1, 1]}>
               <Scene />
@@ -41,5 +40,23 @@ export default function CanvasAndScene() {
 }
 
 function Scene() {
-  return <SpinningParticle />;
+  const isDaytime = false;
+  // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
+
+  return (
+    <>
+      <Stars count={1000} />
+      <Sky
+        distance={450000}
+        sunPosition={[0, isDaytime ? 1 : -1, 0]}
+        inclination={0}
+        azimuth={0.25}
+        rayleigh={20}
+        mieCoefficient={0.008}
+        mieDirectionalG={0.063}
+        turbidity={10}
+      />
+      <SpinningParticle />
+    </>
+  );
 }

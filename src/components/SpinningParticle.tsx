@@ -1,4 +1,4 @@
-import { Html, Sky, Stars } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
@@ -19,6 +19,8 @@ export default function SpinningParticle() {
   const ref4 = useRef(null as any);
   const ref5 = useRef(null as any);
 
+  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
+
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
     if (!ref1.current) {
@@ -32,9 +34,21 @@ export default function SpinningParticle() {
     ref2.current.rotation.y =
       ref2.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
 
-    ref3.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-    ref3.current.rotation.y =
-      ref3.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+    if (zoomedIn) {
+      // move slowly from [x,y,z] to rotation
+      // e.g. 5 -> 2
+      // 5 = 5 + (2-5)/2
+      ref3.current.rotation.x =
+        ref3.current.rotation.x + (rotation.x - ref3.current.rotation.x) / 20;
+      ref3.current.rotation.y =
+        ref3.current.rotation.y + (rotation.y - ref3.current.rotation.y) / 20;
+      ref3.current.rotation.z =
+        ref3.current.rotation.z + (rotation.z - ref3.current.rotation.z) / 20;
+    } else {
+      ref3.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+      ref3.current.rotation.y =
+        ref3.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+    }
 
     ref4.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
     ref4.current.rotation.y =
@@ -70,12 +84,12 @@ export default function SpinningParticle() {
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
-    opacity: zoomedIn ? 0.8 : 0,
+    opacity: !zoomedIn ? 0.5 : 0.8,
     config: {
       mass: 20,
       tension: zoomedIn ? 160 : 80,
-      friction: 18,
-      clamp: zoomedIn,
+      friction: zoomedIn ? 70 : 18,
+      clamp: false,
     },
     // // unmount the particle when it's fully decayed
     // onRest: (spring) => {
@@ -100,8 +114,6 @@ export default function SpinningParticle() {
     }
   });
   const hourOfDay = new Date().getHours();
-  const isDaytime = false;
-  // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
 
   const degToRad = (deg) => (deg / 360) * Math.PI * 2;
   const [x, y, z] = [
@@ -110,8 +122,6 @@ export default function SpinningParticle() {
     -degToRad(dOrient.gamma),
   ];
 
-  const rotX = useControl("rotX");
-
   return (
     <animated.mesh
       scale={springProps.scale}
@@ -119,38 +129,21 @@ export default function SpinningParticle() {
       onPointerDown={handleZoomIn}
       rotation={[x, y, z]}
     >
-      {/* <Html>
+      <Html>
         {
           <div style={{ color: "white", overflowWrap: "anywhere", width: 160 }}>
-            orientation: {JSON.stringify(dOrient)}
-            isSupported: {isSupported}
+            {Object.values(dOrient)
+              .slice(1)
+              .map((d) => Number(d).toFixed(0) + ",")}
           </div>
         }
-      </Html> */}
-      <Stars count={100} />
-      <Sky
-        distance={450000}
-        sunPosition={[0, isDaytime ? 1 : -1, 0]}
-        inclination={0}
-        azimuth={0.25}
-        rayleigh={3}
-        mieCoefficient={0.008}
-        mieDirectionalG={0.063}
-        turbidity={10}
-      />
+      </Html>
+
       {/* zoomed in - solid object */}
-      <mesh renderOrder={3} transparent={true}>
-        <dodecahedronBufferGeometry args={[scalePct * 1.5, 0]} />
-        <animated.meshPhysicalMaterial
-          transparent={true}
-          opacity={springProps.opacity}
-        />
-      </mesh>
-      {/* decorative transparent objects */}
-      <mesh ref={ref1}>
+      <animated.mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
-        <meshPhysicalMaterial
-          opacity={0.5}
+        <animated.meshPhysicalMaterial
+          opacity={springProps.opacity}
           transparent={true}
           depthTest={false}
           flatShading={true}
@@ -158,7 +151,8 @@ export default function SpinningParticle() {
           vertexColors={true}
           reflectivity={1}
         />
-      </mesh>
+      </animated.mesh>
+      {/* decorative transparent objects */}
       <mesh ref={ref2}>
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
@@ -202,10 +196,11 @@ export default function SpinningParticle() {
       <mesh ref={ref5}>
         <icosahedronBufferGeometry args={[scalePct * 14, 2]} />
         <meshPhysicalMaterial
-          renderOrder={3}
-          opacity={0.04}
+          renderOrder={0}
+          opacity={0.1}
+          wireframe={zoomedIn}
           transparent={true}
-          depthTest={false}
+          depthTest={zoomedIn}
           flatShading={true}
           roughness={0.4}
           vertexColors={true}
