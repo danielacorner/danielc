@@ -64,13 +64,13 @@ export default function SpinningParticle() {
     type: "number",
     min: 0.1,
     max: 10,
-    value: 5,
+    value: 3.5,
   });
   const scale = zoomedIn ? finalScale : mounted ? 1 : 0;
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
-    opacity: zoomedIn ? 0.9 : 0,
+    opacity: zoomedIn ? 0.8 : 0,
     config: {
       mass: 20,
       tension: zoomedIn ? 160 : 80,
@@ -94,26 +94,40 @@ export default function SpinningParticle() {
   const dOrient = useDeviceOrientation();
   console.log("🌟🚨 ~ SpinningParticle ~ dOrient", dOrient);
   const isSupported = window.DeviceOrientationEvent;
+  useMount(() => {
+    if (isSupported) {
+      set({ isSpinning: false });
+    }
+  });
   const hourOfDay = new Date().getHours();
   const isDaytime = false;
   // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
+
+  const degToRad = (deg) => (deg / 360) * Math.PI * 2;
+  const [x, y, z] = [
+    -degToRad(dOrient.beta),
+    -degToRad(dOrient.alpha),
+    -degToRad(dOrient.gamma),
+  ];
+
+  const rotX = useControl("rotX");
 
   return (
     <animated.mesh
       scale={springProps.scale}
       onClick={handleZoomIn}
       onPointerDown={handleZoomIn}
-      rotation={[(Math.PI * dOrient.alpha) / 360, 0, 0]}
+      rotation={[x, y, z]}
     >
-      <Html>
+      {/* <Html>
         {
           <div style={{ color: "white", overflowWrap: "anywhere", width: 160 }}>
             orientation: {JSON.stringify(dOrient)}
             isSupported: {isSupported}
           </div>
         }
-      </Html>
-      <Stars />
+      </Html> */}
+      <Stars count={100} />
       <Sky
         distance={450000}
         sunPosition={[0, isDaytime ? 1 : -1, 0]}
@@ -160,7 +174,7 @@ export default function SpinningParticle() {
       <mesh ref={ref3}>
         <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
         <meshPhysicalMaterial
-          wireframe={zoomedIn}
+          wireframe={false}
           opacity={0.4}
           transparent={true}
           depthTest={false}

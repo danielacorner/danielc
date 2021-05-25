@@ -9,10 +9,11 @@ import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
 import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls } from "react-three-gui";
+import { useStore } from "../store";
 
 export default function CanvasAndScene() {
   const windowSize = useWindowSize();
-
+  const isZoomed = useStore((s) => s.isZoomed);
   return (
     <Controls.Provider>
       <Controls.Canvas
@@ -26,7 +27,7 @@ export default function CanvasAndScene() {
       >
         <Lighting />
         <SpinScene>
-          <OrbitControls />
+          {!isZoomed && <OrbitControls />}
           <Physics {...PHYSICS_PROPS}>
             <mesh scale={[1, 1, 1]}>
               <Scene />

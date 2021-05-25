@@ -11,6 +11,9 @@ export default function SpinScene({ children }) {
   const ref = useRef(null as any);
   useFrame(({ clock }) => {
     if (!isSpinning) {
+      ref.current.rotation.x = 0;
+      ref.current.rotation.y = 0;
+      ref.current.rotation.z = 0;
       return;
     }
     const time = clock.getElapsedTime();
