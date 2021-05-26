@@ -14,16 +14,24 @@ export function useLocalStorageState(
   { serialize = JSON.stringify, deserialize = JSON.parse }: any = {}
 ) {
   const [state, setState] = React.useState(() => {
+    const value =
+      typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    if (typeof window === "undefined") {
+      return value;
+    }
     const valueInLocalStorage = window.localStorage.getItem(key);
     if (valueInLocalStorage) {
       return deserialize(valueInLocalStorage);
     }
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return value;
   });
 
   const prevKeyRef = React.useRef(key);
 
   React.useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
     const prevKey = prevKeyRef.current;
     if (prevKey !== key) {
       window.localStorage.removeItem(prevKey);

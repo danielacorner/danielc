@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import { useDeviceOrientation, useMount } from "../utils/hooks";
+import { useDeviceOrientation, useMount } from "../../utils/hooks";
 import { Html } from "@react-three/drei";
-import { useStore } from "../store";
+import { useStore } from "../../store";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 

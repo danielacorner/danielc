@@ -39,7 +39,7 @@ export default function CanvasAndScene() {
           </Physics>
         </SpinScene>
       </Controls.Canvas>
-      <Controls />
+      {process.env.NODE_ENV !== "production" && <Controls />}
     </Controls.Provider>
   );
 }
@@ -51,13 +51,7 @@ function Scene() {
     <>
       <ModifiedOrbitControls />
       <Stars count={1000} />
-      <Environment
-        background={false}
-        // files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
-        path={"/"}
-        preset={"night"}
-        scene={undefined} // adds the ability to pass a custom THREE.Scene
-      />
+      <Environment background={false} path={"/"} preset={"night"} />
       <Sky
         rayleigh={7}
         mieCoefficient={0.1}
