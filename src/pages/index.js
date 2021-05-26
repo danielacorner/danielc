@@ -2,6 +2,8 @@ import * as React from "react";
 import Layout from "../components/Layout";
 import styled from "styled-components/macro";
 import CanvasAndScene from "../components/CanvasAndScene";
+import { useStore } from "../store";
+import InvisibleScrollHandler from "../components/InvisibleScrollHandler";
 
 export default function IndexPage() {
   return (
@@ -14,12 +16,15 @@ export default function IndexPage() {
 }
 
 function Background() {
+  const isScrollable = useStore((s) => s.isScrollable);
   return (
     <BackgroundStyles>
       <CanvasAndScene />
+      {isScrollable && <InvisibleScrollHandler />}
     </BackgroundStyles>
   );
 }
+
 const BackgroundStyles = styled.div`
   position: fixed;
   top: 0;

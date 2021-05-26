@@ -1,10 +1,9 @@
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
 import { useControl } from "react-three-gui";
 import { useStore } from "../store";
-import { useDeviceOrientation, useMount } from "../utils/hooks";
+import { useMount } from "../utils/hooks";
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
@@ -64,8 +63,11 @@ export default function SpinningParticle() {
     setMounted(true);
   });
 
-  const [zoomedIn, setZoomedIn] = useState(false);
-  const handleZoomIn = () => setZoomedIn(true);
+  const scrollTopPct = useStore((s) => s.scrollTopPct);
+  console.log("🌟🚨 ~ SpinningParticle ~ scrollTopPct", scrollTopPct);
+
+  const zoomedIn = useStore((s) => s.isZoomed);
+  const handleZoomIn = () => set({ isZoomed: true });
 
   const set = useStore((s) => s.set);
   useEffect(() => {
@@ -97,6 +99,7 @@ export default function SpinningParticle() {
     onRest: (spring) => {
       if (zoomedIn) {
         setIsWireframe(true);
+        set({ isScrollable: true });
       }
     },
     // onRest: (spring) => {

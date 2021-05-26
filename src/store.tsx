@@ -11,6 +11,7 @@ type GlobalStateType = {
   paused: boolean;
   /** if a property in the store is animating e.g. scale, can turn things on/off */
   isPropertyAnimating: boolean;
+  scrollTopPct: number;
   viruses: VirusParticle[];
   createVirus: (newVir: VirusParticle) => any;
   set: (newState: any) => any;
@@ -38,6 +39,7 @@ export const useStore = create<GlobalStateType>(
     isZoomed: false,
     isSoundOn: initialIsSoundOn,
     isPropertyAnimating: false,
+    scrollTopPct: 0,
     viruses: [],
     createVirus: (newVir) =>
       set((state) => ({ viruses: [...state.viruses, newVir] })),
