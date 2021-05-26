@@ -9,7 +9,6 @@ export function useRotateWithDevice() {
   const ref = useRef(null as any);
   const set = useStore((s) => s.set);
   const dOrient = useDeviceOrientation();
-  console.log("🌟🚨 ~ SpinningParticle ~ dOrient", dOrient);
   const isSupported =
     typeof window !== "undefined" && window.DeviceOrientationEvent;
   useMount(() => {

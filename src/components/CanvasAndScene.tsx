@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useWindowSize } from "../utils/hooks";
 import * as THREE from "three";
-import { Environment, Sky, Stars } from "@react-three/drei";
-import { Canvas } from "react-three-fiber";
+import {
+  DeviceOrientationControls,
+  Environment,
+  Sky,
+  Stars,
+} from "@react-three/drei";
 import { OrbitControls } from "@react-three/drei";
 import { Lighting } from "./Lighting";
 import { Physics } from "@react-three/cannon";
@@ -11,6 +15,8 @@ import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls } from "react-three-gui";
 import { useRotateWithDevice } from "./useRotateWithDevice";
+import { useFrame } from "@react-three/fiber";
+import { ModifiedOrbitControls } from "./ModifiedOrbitControls";
 
 export default function CanvasAndScene() {
   const windowSize = useWindowSize();
@@ -34,7 +40,8 @@ export default function CanvasAndScene() {
       >
         <Lighting />
         <SpinScene>
-          {process.env.NODE_ENV === "development" && <OrbitControls />}
+          {process.env.NODE_ENV === "development" && <ModifiedOrbitControls />}
+          {/* {process.env.NODE_ENV === "development" && <OrbitControls />} */}
           <Physics {...PHYSICS_PROPS}>
             <mesh scale={[1, 1, 1]}>
               <Scene />
@@ -48,12 +55,11 @@ export default function CanvasAndScene() {
 }
 
 function Scene() {
-  const isDaytime = false;
   // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
   const { x, y, z, infoHtml } = useRotateWithDevice();
 
   return (
-    <mesh rotation={[x, y, z]}>
+    <>
       {process.env.NODE_ENV === "development" && infoHtml}
       <Stars count={1000} />
       <Environment
@@ -64,16 +70,12 @@ function Scene() {
         scene={undefined} // adds the ability to pass a custom THREE.Scene
       />
       <Sky
-        distance={450000}
-        sunPosition={[0, isDaytime ? 1 : -1, 0]}
-        inclination={0}
-        azimuth={0.25}
-        rayleigh={1}
-        mieCoefficient={0.08}
-        mieDirectionalG={0.063}
-        turbidity={16}
+        rayleigh={7}
+        mieCoefficient={0.1}
+        mieDirectionalG={1}
+        turbidity={10}
       />
       <SpinningParticle />
-    </mesh>
+    </>
   );
 }

@@ -72,8 +72,6 @@ export default function SpinningParticle() {
     set({ isSpinning: !zoomedIn });
   }, [zoomedIn]);
 
-  console.log("🌟🚨 ~ SpinningParticle ~ zoomedIn", zoomedIn);
-
   const finalScale = useControl("finalScale", {
     type: "number",
     min: 0.1,

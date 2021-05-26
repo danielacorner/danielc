@@ -8,7 +8,6 @@ const AMPLITUDE_Y = 0.2;
 // const AMPLITUDE_X = 0.7;
 export default function SpinScene({ children }) {
   const isSpinning = useStore((s) => s.isSpinning);
-  console.log("🌟🚨 ~ SpinScene ~ isSpinning", isSpinning);
   const ref = useRef(null as any);
   useFrame(({ clock }) => {
     if (!isSpinning) {
