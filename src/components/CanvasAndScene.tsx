@@ -1,7 +1,7 @@
 import React from "react";
 import { useWindowSize } from "../utils/hooks";
 import * as THREE from "three";
-import { Sky, Stars } from "@react-three/drei";
+import { Environment, Sky, Stars } from "@react-three/drei";
 import { Canvas } from "react-three-fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Lighting } from "./Lighting";
@@ -56,6 +56,13 @@ function Scene() {
     <mesh rotation={[x, y, z]}>
       {process.env.NODE_ENV === "development" && infoHtml}
       <Stars count={1000} />
+      <Environment
+        background={false}
+        // files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
+        path={"/"}
+        preset={"night"}
+        scene={undefined} // adds the ability to pass a custom THREE.Scene
+      />
       <Sky
         distance={450000}
         sunPosition={[0, isDaytime ? 1 : -1, 0]}

@@ -87,6 +87,8 @@ export default function SpinningParticle() {
   const springProps = useSpring({
     scale: [scale, scale, scale],
     opacity: !zoomedIn ? 0.5 : 0.8,
+    opacity2: !zoomedIn ? 0.2 : 0.8,
+    roughness: !zoomedIn ? 0.4 : 0,
     config: {
       mass: 20,
       tension: zoomedIn ? 160 : 80,
@@ -125,6 +127,7 @@ export default function SpinningParticle() {
         />
       </animated.mesh>
       {/* decorative transparent objects */}
+      {/* <> */}
       <mesh ref={ref2}>
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
@@ -137,16 +140,18 @@ export default function SpinningParticle() {
           reflectivity={1}
         />
       </mesh>
+      {/* < = > */}
       <mesh ref={ref3}>
         <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
-        <meshPhysicalMaterial
+        <animated.meshPhysicalMaterial
           wireframe={false}
-          opacity={0.4}
+          opacity={springProps.opacity2}
           transparent={true}
           depthTest={true}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
+          flatShading={false}
+          roughness={springProps.roughness}
+          vertexColors={false}
+          metalness={0.9}
           reflectivity={1}
         />
       </mesh>
