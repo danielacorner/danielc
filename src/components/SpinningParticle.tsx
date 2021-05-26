@@ -78,9 +78,11 @@ export default function SpinningParticle() {
     type: "number",
     min: 0.1,
     max: 10,
-    value: 3.5,
+    value: 4,
   });
   const scale = zoomedIn ? finalScale : mounted ? 1 : 0;
+
+  const [isWireframe, setIsWireframe] = useState(false);
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
@@ -92,60 +94,30 @@ export default function SpinningParticle() {
       clamp: false,
     },
     // // unmount the particle when it's fully decayed
+    onRest: (spring) => {
+      if (zoomedIn) {
+        setIsWireframe(true);
+      }
+    },
     // onRest: (spring) => {
-    //   const isDecayed = spring.scale[0] === 0;
-    //   // TODO: if type === PROTEIN_TYPES.antibody
-    //   // TODO: else if type === PROTEIN_TYPES.virus
-    //   if (isDecayed) {
-    //     if (type === PROTEIN_TYPES.virus) {
-    //       incrementNumDefeatedViruses();
-    //     }
     //     unmount();
     //   }
     // },
   });
-
-  const dOrient = useDeviceOrientation();
-  console.log("🌟🚨 ~ SpinningParticle ~ dOrient", dOrient);
-  const isSupported = window.DeviceOrientationEvent;
-  useMount(() => {
-    if (isSupported) {
-      set({ isSpinning: false });
-    }
-  });
-  const hourOfDay = new Date().getHours();
-
-  const degToRad = (deg) => (deg / 360) * Math.PI * 2;
-  const [x, y, z] = [
-    -degToRad(dOrient.beta),
-    -degToRad(dOrient.alpha),
-    -degToRad(dOrient.gamma),
-  ];
 
   return (
     <animated.mesh
       scale={springProps.scale}
       onClick={handleZoomIn}
       onPointerDown={handleZoomIn}
-      rotation={[x, y, z]}
     >
-      <Html>
-        {
-          <div style={{ color: "white", overflowWrap: "anywhere", width: 160 }}>
-            {Object.values(dOrient)
-              .slice(1)
-              .map((d) => Number(d).toFixed(0) + ",")}
-          </div>
-        }
-      </Html>
-
       {/* zoomed in - solid object */}
       <animated.mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <animated.meshPhysicalMaterial
           opacity={springProps.opacity}
           transparent={true}
-          depthTest={false}
+          depthTest={true}
           flatShading={true}
           roughness={0.4}
           vertexColors={true}
@@ -158,7 +130,7 @@ export default function SpinningParticle() {
         <meshPhysicalMaterial
           opacity={0.4}
           transparent={true}
-          depthTest={false}
+          depthTest={true}
           flatShading={true}
           roughness={0.4}
           vertexColors={true}
@@ -171,7 +143,7 @@ export default function SpinningParticle() {
           wireframe={false}
           opacity={0.4}
           transparent={true}
-          depthTest={false}
+          depthTest={true}
           flatShading={true}
           roughness={0.4}
           vertexColors={true}
@@ -183,10 +155,10 @@ export default function SpinningParticle() {
         <meshPhysicalMaterial
           renderOrder={3}
           color="tomato"
-          wireframe={zoomedIn}
-          opacity={0.08}
+          wireframe={isWireframe}
+          opacity={isWireframe ? 0.05 : 0.08}
           transparent={true}
-          depthTest={false}
+          depthTest={true}
           flatShading={true}
           roughness={0.4}
           vertexColors={true}
@@ -197,8 +169,8 @@ export default function SpinningParticle() {
         <icosahedronBufferGeometry args={[scalePct * 14, 2]} />
         <meshPhysicalMaterial
           renderOrder={0}
-          opacity={0.1}
-          wireframe={zoomedIn}
+          opacity={isWireframe ? 0.03 : 0.04}
+          wireframe={true}
           transparent={true}
           depthTest={zoomedIn}
           flatShading={true}

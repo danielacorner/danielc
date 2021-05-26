@@ -11,9 +11,6 @@ type GlobalStateType = {
   paused: boolean;
   /** if a property in the store is animating e.g. scale, can turn things on/off */
   isPropertyAnimating: boolean;
-  waveStartTime: number | null;
-  pointerDownStartTime: number | null;
-  absCreatedSincePointerDown: number;
   viruses: VirusParticle[];
   createVirus: (newVir: VirusParticle) => any;
   set: (newState: any) => any;
@@ -41,9 +38,6 @@ export const useStore = create<GlobalStateType>(
     isZoomed: false,
     isSoundOn: initialIsSoundOn,
     isPropertyAnimating: false,
-    waveStartTime: null,
-    pointerDownStartTime: null,
-    absCreatedSincePointerDown: 0,
     viruses: [],
     createVirus: (newVir) =>
       set((state) => ({ viruses: [...state.viruses, newVir] })),
