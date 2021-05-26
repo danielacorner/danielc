@@ -1,21 +1,13 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { useWindowSize } from "../utils/hooks";
 import * as THREE from "three";
-import {
-  DeviceOrientationControls,
-  Environment,
-  Sky,
-  Stars,
-} from "@react-three/drei";
-import { OrbitControls } from "@react-three/drei";
+import { Environment, Sky, Stars } from "@react-three/drei";
 import { Lighting } from "./Lighting";
 import { Physics } from "@react-three/cannon";
 import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
 import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls } from "react-three-gui";
-import { useRotateWithDevice } from "./useRotateWithDevice";
-import { useFrame } from "@react-three/fiber";
 import { ModifiedOrbitControls } from "./ModifiedOrbitControls";
 
 export default function CanvasAndScene() {
@@ -40,8 +32,6 @@ export default function CanvasAndScene() {
       >
         <Lighting />
         <SpinScene>
-          {process.env.NODE_ENV === "development" && <ModifiedOrbitControls />}
-          {/* {process.env.NODE_ENV === "development" && <OrbitControls />} */}
           <Physics {...PHYSICS_PROPS}>
             <mesh scale={[1, 1, 1]}>
               <Scene />
@@ -56,11 +46,10 @@ export default function CanvasAndScene() {
 
 function Scene() {
   // const isDaytime = hourOfDay > 5 && hourOfDay <= 18;
-  const { x, y, z, infoHtml } = useRotateWithDevice();
 
   return (
     <>
-      {process.env.NODE_ENV === "development" && infoHtml}
+      <ModifiedOrbitControls />
       <Stars count={1000} />
       <Environment
         background={false}

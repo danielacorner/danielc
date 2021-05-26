@@ -399,8 +399,8 @@ function OrbitControls(object, domElement) {
     }
 
     if (state !== STATE.NONE) {
-      document.addEventListener("mousemove", onMouseMove, false);
-      document.addEventListener("mouseup", onMouseUp, false);
+      // document.addEventListener("mousemove", onMouseMove, false);
+      // document.addEventListener("mouseup", onMouseUp, false);
       scope.dispatchEvent(startEvent);
     }
   }
@@ -689,22 +689,22 @@ function OrbitControls(object, domElement) {
     }
   } //tilt
 
-  this.domElement.addEventListener(
-    "contextmenu",
-    function (event) {
-      event.preventDefault();
-    },
-    false
-  );
-  this.domElement.addEventListener("mousedown", onMouseDown, false);
-  this.domElement.addEventListener("mousewheel", onMouseWheel, false);
-  this.domElement.addEventListener("DOMMouseScroll", onMouseWheel, false); // firefox
+  // this.domElement.addEventListener(
+  //   "contextmenu",
+  //   function (event) {
+  //     event.preventDefault();
+  //   },
+  //   false
+  // );
+  // this.domElement.addEventListener("mousedown", onMouseDown, false);
+  // this.domElement.addEventListener("mousewheel", onMouseWheel, false);
+  // this.domElement.addEventListener("DOMMouseScroll", onMouseWheel, false); // firefox
 
-  this.domElement.addEventListener("touchstart", touchstart, false);
-  this.domElement.addEventListener("touchend", touchend, false);
-  this.domElement.addEventListener("touchmove", touchmove, false);
+  // this.domElement.addEventListener("touchstart", touchstart, false);
+  // this.domElement.addEventListener("touchend", touchend, false);
+  // this.domElement.addEventListener("touchmove", touchmove, false);
 
-  window.addEventListener("keydown", onKeyDown, false);
+  // window.addEventListener("keydown", onKeyDown, false);
 
   if (window.DeviceOrientationEvent) {
     window.addEventListener("deviceorientation", tilt, false);
