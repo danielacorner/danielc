@@ -4,6 +4,7 @@ import { useSpring, animated } from "react-spring/three";
 import { useControl } from "react-three-gui";
 import { useStore } from "../store";
 import { useMount } from "../utils/hooks";
+import { useTexture } from "@react-three/drei";
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
@@ -108,13 +109,18 @@ export default function SpinningParticle() {
     // },
   });
 
+  const twentyTextures = useTexture(
+    [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
+  );
+  // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
+
   return (
     <animated.mesh
       scale={springProps.scale}
       onClick={handleZoomIn}
       onPointerDown={handleZoomIn}
     >
-      {/* zoomed in - solid object */}
+      {/* tetrahedron */}
       <animated.mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <animated.meshPhysicalMaterial
@@ -127,8 +133,7 @@ export default function SpinningParticle() {
           reflectivity={1}
         />
       </animated.mesh>
-      {/* decorative transparent objects */}
-      {/* <> */}
+      {/* octahedron */}
       <mesh ref={ref2}>
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
@@ -141,20 +146,28 @@ export default function SpinningParticle() {
           reflectivity={1}
         />
       </mesh>
-      {/* < = > */}
+      {/* icosahedron */}
       <mesh ref={ref3}>
-        <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
-        <animated.meshPhysicalMaterial
-          wireframe={false}
-          opacity={springProps.opacity2}
-          transparent={true}
-          depthTest={true}
-          flatShading={false}
-          roughness={springProps.roughness}
-          vertexColors={false}
-          metalness={0.9}
-          reflectivity={1}
-        />
+        <mesh>
+          <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
+          <animated.meshPhysicalMaterial
+            wireframe={false}
+            opacity={springProps.opacity2}
+            transparent={true}
+            depthTest={true}
+            flatShading={false}
+            roughness={springProps.roughness}
+            vertexColors={false}
+            metalness={0.9}
+            reflectivity={1}
+          />
+        </mesh>
+        {/* <mesh>
+          <icosahedronBufferGeometry args={[scalePct * 1.02, 0]} />
+          {twentyTextures.map((texture) => (
+            <meshStandardMaterial map={texture} attach="material" />
+          ))}
+        </mesh> */}
       </mesh>
       <mesh ref={ref4}>
         <icosahedronBufferGeometry args={[scalePct * 4, 1]} />

@@ -1,7 +1,7 @@
 import React from "react";
 import { useWindowSize } from "../utils/hooks";
 import * as THREE from "three";
-import { Environment, Sky, Stars } from "@react-three/drei";
+import { Environment, OrbitControls, Sky, Stars } from "@react-three/drei";
 import { Lighting } from "./Lighting";
 import { Physics } from "@react-three/cannon";
 import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
@@ -49,6 +49,7 @@ function Scene() {
 
   return (
     <>
+      {process.env.NODE_ENV === "development" && <OrbitControls />}
       <ModifiedOrbitControls />
       <Stars count={1000} />
       <Environment background={false} path={"/"} preset={"night"} />
