@@ -23,6 +23,12 @@ const COMMON_PROPS = {
   reflectivity: 1,
 };
 
+const D20_ROTATION = {
+  x: -0.87,
+  y: 57.6,
+  z: 54.8,
+};
+
 const degToRad = THREE.Math.degToRad;
 const radToDeg = THREE.Math.radToDeg;
 
@@ -50,50 +56,15 @@ export default function SpinningParticle() {
   // }, [animationStep]);
   console.log("🌟🚨 ~ SpinningParticle ~ animationStep", animationStep);
 
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    if (!ref1.current) {
-      return;
-    }
-    ref1.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-    ref1.current.rotation.y =
-      ref1.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+  const zoomedIn = useStore((s) => s.isZoomed);
 
-    ref2.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-    ref2.current.rotation.y =
-      ref2.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
-
-    if (zoomedIn) {
-      // move slowly from [x,y,z] to rotation
-      // e.g. 5 -> 2
-      // 5 = 5 + (2-5)/2
-      ref3.current.rotation.x =
-        ref3.current.rotation.x + (rotation.x - ref3.current.rotation.x) / 20;
-      ref3.current.rotation.y =
-        ref3.current.rotation.y + (rotation.y - ref3.current.rotation.y) / 20;
-      ref3.current.rotation.z =
-        ref3.current.rotation.z + (rotation.z - ref3.current.rotation.z) / 20;
-    } else {
-      ref3.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-      ref3.current.rotation.y =
-        ref3.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
-    }
-
-    ref4.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-    ref4.current.rotation.y =
-      ref4.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
-
-    ref5.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
-    ref5.current.rotation.y =
-      ref5.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
-  });
+  useSpinObjects(ref1, ref2, zoomedIn, ref3, rotation, ref4, ref5);
 
   const [mounted, setMounted] = useState(false);
   useMount(() => {
     setMounted(true);
   });
 
-  const zoomedIn = useStore((s) => s.isZoomed);
   const handleZoomIn = () => set({ isZoomed: true });
 
   const set = useStore((s) => s.set);
@@ -135,26 +106,26 @@ export default function SpinningParticle() {
   // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
 
   const rotXDeg = useControl("rotX", {
-    value: 0,
+    value: D20_ROTATION.x,
     type: "number",
-    min: 0,
-    max: 360,
+    min: -10,
+    max: 10,
   });
   const rotX = degToRad(rotXDeg);
 
   const rotYDeg = useControl("rotY", {
-    value: 57.6,
+    value: D20_ROTATION.y,
     type: "number",
-    min: 0,
-    max: 360,
+    min: 50,
+    max: 60,
   });
   const rotY = degToRad(rotYDeg);
 
   const rotZDeg = useControl("rotZ", {
-    value: 57.6,
+    value: D20_ROTATION.z,
     type: "number",
-    min: 0,
-    max: 360,
+    min: 50,
+    max: 60,
   });
   const rotZ = degToRad(rotZDeg);
 
@@ -258,6 +229,54 @@ export default function SpinningParticle() {
 }
 
 const NUM_STEPS = 20;
+
+function useSpinObjects(
+  ref1: React.MutableRefObject<any>,
+  ref2: React.MutableRefObject<any>,
+  zoomedIn: boolean,
+  ref3: React.MutableRefObject<any>,
+  rotation: { x: any; y: number; z: number },
+  ref4: React.MutableRefObject<any>,
+  ref5: React.MutableRefObject<any>
+) {
+  useFrame(({ clock }) => {
+    const time = clock.getElapsedTime();
+    if (!ref1.current) {
+      return;
+    }
+    ref1.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+    ref1.current.rotation.y =
+      ref1.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+
+    ref2.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+    ref2.current.rotation.y =
+      ref2.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+
+    if (zoomedIn) {
+      // move slowly from [x,y,z] to rotation
+      // e.g. 5 -> 2
+      // 5 = 5 + (2-5)/2
+      ref3.current.rotation.x =
+        ref3.current.rotation.x + (rotation.x - ref3.current.rotation.x) / 20;
+      ref3.current.rotation.y =
+        ref3.current.rotation.y + (rotation.y - ref3.current.rotation.y) / 20;
+      ref3.current.rotation.z =
+        ref3.current.rotation.z + (rotation.z - ref3.current.rotation.z) / 20;
+    } else {
+      ref3.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+      ref3.current.rotation.y =
+        ref3.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+    }
+
+    ref4.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+    ref4.current.rotation.y =
+      ref4.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+
+    ref5.current.rotation.x = -Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
+    ref5.current.rotation.y =
+      ref5.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
+  });
+}
 
 function useAnimationStep() {
   const scrollTopPct = useStore((s) => s.scrollTopPct);
