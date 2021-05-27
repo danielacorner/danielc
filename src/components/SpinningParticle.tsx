@@ -8,8 +8,6 @@ import * as THREE from "three";
 import D20 from "./GLTFs/D20";
 import { useControl } from "react-three-gui";
 
-const d20scale = 0.07;
-
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
 const AMPLITUDE_Y = 1;
@@ -26,6 +24,7 @@ const COMMON_PROPS = {
 };
 
 const degToRad = THREE.Math.degToRad;
+const radToDeg = THREE.Math.radToDeg;
 
 // rotate the icosahedron to each face, with the triangle pointing down
 const SIDES = [{ x: degToRad(70), y: 0, z: 0 }];
@@ -134,7 +133,38 @@ export default function SpinningParticle() {
     [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
   );
   // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
-  const rotY = useControl("rotY");
+
+  const rotXDeg = useControl("rotX", {
+    value: 0,
+    type: "number",
+    min: 0,
+    max: 360,
+  });
+  const rotX = degToRad(rotXDeg);
+
+  const rotYDeg = useControl("rotY", {
+    value: 57.6,
+    type: "number",
+    min: 0,
+    max: 360,
+  });
+  const rotY = degToRad(rotYDeg);
+
+  const rotZDeg = useControl("rotZ", {
+    value: 57.6,
+    type: "number",
+    min: 0,
+    max: 360,
+  });
+  const rotZ = degToRad(rotZDeg);
+
+  const d20scale = useControl("d20scale", {
+    value: 0.08,
+    type: "number",
+    min: 0.04,
+    max: 0.16,
+  });
+
   return (
     <animated.mesh
       scale={springProps.scale}
@@ -173,7 +203,10 @@ export default function SpinningParticle() {
             metalness={0.9}
           />
         </mesh>
-        <D20 scale={[d20scale, d20scale, d20scale]} rotation={[0, rotY, 0]} />
+        <D20
+          scale={[d20scale, d20scale, d20scale]}
+          rotation={[rotX, rotY, rotZ]}
+        />
         {/* <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1.02, 0]} />
           {twentyTextures.map((texture) => (
