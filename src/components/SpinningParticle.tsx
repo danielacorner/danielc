@@ -1,4 +1,4 @@
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
 import { useStore } from "../store";
@@ -13,7 +13,7 @@ const SPEED_X = 0.2;
 const AMPLITUDE_Y = 1;
 const AMPLITUDE_X_INV = 0.01;
 
-const COMMON_PROPS = {
+const COMMON_MATERIAL_PROPS = {
   transparent: true,
   wireframe: false,
   depthTest: false,
@@ -23,17 +23,19 @@ const COMMON_PROPS = {
   reflectivity: 1,
 };
 
-const D20_ROTATION = {
-  x: -0.87,
-  y: 57.6,
-  z: 54.8,
-};
-
 const degToRad = THREE.Math.degToRad;
 const radToDeg = THREE.Math.radToDeg;
 
+const D20_ROTATION = {
+  x: degToRad(-0.87),
+  y: degToRad(57.6),
+  z: degToRad(54.8),
+};
+
 // rotate the icosahedron to each face, with the triangle pointing down
-const SIDES = [{ x: degToRad(70), y: 0, z: 0 }];
+const SIDES_ROTATIONS = [{ x: 70.81, y: 0, z: 0 }].map((side) =>
+  Object.fromEntries(Object.entries(side).map((xyz) => degToRad(xyz)))
+);
 
 export default function SpinningParticle() {
   const scalePct = 1;
@@ -44,11 +46,15 @@ export default function SpinningParticle() {
   const ref4 = useRef(null as any);
   const ref5 = useRef(null as any);
 
-  const [rotation, setRotation] = useState({
-    x: degToRad(50),
-    y: 0,
-    z: 0,
-  });
+  const x = useControl("x", { type: "number", value: 70.81, min: 70, max: 72 });
+  const y = useControl("y", { type: "number", value: 0, min: 0, max: 90 });
+  const z = useControl("z", { type: "number", value: 0, min: 0, max: 90 });
+  const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+  // const [rotation, setRotation] = useState({
+  //   x: degToRad(x),
+  //   y: degToRad(y),
+  //   z: degToRad(z),
+  // });
 
   const animationStep = useAnimationStep();
   // useEffect(() => {
@@ -72,7 +78,7 @@ export default function SpinningParticle() {
     set({ isSpinning: !zoomedIn });
   }, [zoomedIn]);
 
-  const scale = zoomedIn ? 4 : mounted ? 1 : 0;
+  const scale = zoomedIn ? 4.5 : mounted ? 1 : 0;
 
   const [isWireframe, setIsWireframe] = useState(false);
 
@@ -80,6 +86,7 @@ export default function SpinningParticle() {
     scale: [scale, scale, scale],
     opacity: !zoomedIn ? 0.5 : 0.8,
     opacity2: !zoomedIn ? 0.2 : 0.8,
+    opacityD20: !zoomedIn ? 0 : 0.2,
     roughness: !zoomedIn ? 0.4 : 0,
     config: {
       mass: 20,
@@ -105,29 +112,29 @@ export default function SpinningParticle() {
   );
   // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
 
-  const rotXDeg = useControl("rotX", {
-    value: D20_ROTATION.x,
-    type: "number",
-    min: -10,
-    max: 10,
-  });
-  const rotX = degToRad(rotXDeg);
+  // const rotXDeg = useControl("rotX", {
+  //   value: D20_ROTATION.x,
+  //   type: "number",
+  //   min: -10,
+  //   max: 10,
+  // });
+  // const rotX = degToRad(rotXDeg);
 
-  const rotYDeg = useControl("rotY", {
-    value: D20_ROTATION.y,
-    type: "number",
-    min: 50,
-    max: 60,
-  });
-  const rotY = degToRad(rotYDeg);
+  // const rotYDeg = useControl("rotY", {
+  //   value: D20_ROTATION.y,
+  //   type: "number",
+  //   min: 50,
+  //   max: 60,
+  // });
+  // const rotY = degToRad(rotYDeg);
 
-  const rotZDeg = useControl("rotZ", {
-    value: D20_ROTATION.z,
-    type: "number",
-    min: 50,
-    max: 60,
-  });
-  const rotZ = degToRad(rotZDeg);
+  // const rotZDeg = useControl("rotZ", {
+  //   value: D20_ROTATION.z,
+  //   type: "number",
+  //   min: 50,
+  //   max: 60,
+  // });
+  // const rotZ = degToRad(rotZDeg);
 
   const d20scale = useControl("d20scale", {
     value: 0.08,
@@ -135,7 +142,28 @@ export default function SpinningParticle() {
     min: 0.04,
     max: 0.16,
   });
-
+  // const texture = useLoader(THREE.TextureLoader, [
+  //   `https://picsum.photos/50/50`,
+  // ]);
+  // const texture = useTexture([`https://picsum.photos/50/50`]);
+  // const opacity = useControl("opacity", {
+  //   value: 0.3,
+  //   type: "number",
+  //   min: 0.04,
+  //   max: 0.94,
+  // });
+  // const metalness = useControl("metalness", {
+  //   value: 123.33,
+  //   type: "number",
+  //   min: 0,
+  //   max: 1000,
+  // });
+  // const roughness = useControl("roughness", {
+  //   value: 0.07,
+  //   type: "number",
+  //   min: 0.0,
+  //   max: 1,
+  // });
   return (
     <animated.mesh
       scale={springProps.scale}
@@ -146,7 +174,7 @@ export default function SpinningParticle() {
       <animated.mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <animated.meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           opacity={springProps.opacity}
           depthTest={true}
         />
@@ -155,7 +183,7 @@ export default function SpinningParticle() {
       <mesh ref={ref2}>
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           opacity={0.4}
           depthTest={true}
         />
@@ -165,7 +193,7 @@ export default function SpinningParticle() {
         <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
           <animated.meshPhysicalMaterial
-            {...COMMON_PROPS}
+            {...COMMON_MATERIAL_PROPS}
             opacity={springProps.opacity2}
             depthTest={true}
             flatShading={false}
@@ -176,8 +204,18 @@ export default function SpinningParticle() {
         </mesh>
         <D20
           scale={[d20scale, d20scale, d20scale]}
-          rotation={[rotX, rotY, rotZ]}
-        />
+          rotation={[D20_ROTATION.x, D20_ROTATION.y, D20_ROTATION.z]}
+          // rotation={[rotX, rotY, rotZ]}
+        >
+          <animated.meshStandardMaterial
+            {...COMMON_MATERIAL_PROPS}
+            transparent={true}
+            opacity={springProps.opacityD20}
+            metalness={123.33}
+            roughness={0.07}
+          />
+          {/* <meshStandardMaterial map={texture} attach="material" /> */}
+        </D20>
         {/* <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1.02, 0]} />
           {twentyTextures.map((texture) => (
@@ -188,7 +226,7 @@ export default function SpinningParticle() {
       <mesh ref={ref4}>
         <icosahedronBufferGeometry args={[scalePct * 4, 1]} />
         <meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           renderOrder={3}
           color="tomato"
           wireframe={isWireframe}
@@ -199,7 +237,7 @@ export default function SpinningParticle() {
       <mesh ref={ref5}>
         <icosahedronBufferGeometry args={[scalePct * 14, 2]} />
         <meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           renderOrder={0}
           opacity={isWireframe ? 0.03 : 0.04}
           wireframe={true}
@@ -209,7 +247,7 @@ export default function SpinningParticle() {
       <mesh>
         <icosahedronBufferGeometry args={[scalePct * 100, 5]} />
         <meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           color="rebeccapurple"
           opacity={0.018}
           wireframe={true}
@@ -218,7 +256,7 @@ export default function SpinningParticle() {
       <mesh>
         <icosahedronBufferGeometry args={[scalePct * 600, 10]} />
         <meshPhysicalMaterial
-          {...COMMON_PROPS}
+          {...COMMON_MATERIAL_PROPS}
           color="cornflowerblue"
           opacity={0.01}
           wireframe={true}

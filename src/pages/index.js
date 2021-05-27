@@ -20,7 +20,7 @@ function Background() {
   return (
     <BackgroundStyles>
       <CanvasAndScene />
-      {isScrollable && <InvisibleScrollHandler />}
+      {/* {isScrollable && <InvisibleScrollHandler />} */}
     </BackgroundStyles>
   );
 }
