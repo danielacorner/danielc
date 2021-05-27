@@ -33,9 +33,9 @@ const D20_ROTATION = {
 };
 
 // rotate the icosahedron to each face, with the triangle pointing down
-const SIDES_ROTATIONS = [{ x: 70.81, y: 0, z: 0 }].map((side) =>
-  Object.fromEntries(Object.entries(side).map((xyz) => degToRad(xyz)))
-);
+const SIDES_ROTATIONS = [
+  { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
+];
 
 export default function SpinningParticle() {
   const scalePct = 1;
