@@ -4,7 +4,7 @@ import { useStore } from "../store";
 import { CUSTOM_SCROLLBAR_CSS } from "../utils/cssSnippets";
 import { useWindowSize } from "../utils/hooks";
 
-const HEIGHT_MULTIPLIER = 4;
+const HEIGHT_MULTIPLIER = 10;
 export default function InvisibleScrollHandler() {
   const set = useStore((s) => s.set);
   const windowSize = useWindowSize();

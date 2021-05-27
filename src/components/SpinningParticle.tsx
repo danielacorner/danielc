@@ -1,15 +1,35 @@
 import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
-import { useControl } from "react-three-gui";
 import { useStore } from "../store";
 import { useMount } from "../utils/hooks";
 import { useTexture } from "@react-three/drei";
+import * as THREE from "three";
+import D20 from "./GLTFs/D20";
+import { useControl } from "react-three-gui";
+
+const d20scale = 0.07;
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
 const AMPLITUDE_Y = 1;
 const AMPLITUDE_X_INV = 0.01;
+
+const COMMON_PROPS = {
+  transparent: true,
+  wireframe: false,
+  depthTest: false,
+  flatShading: true,
+  roughness: 0.4,
+  vertexColors: true,
+  reflectivity: 1,
+};
+
+const degToRad = THREE.Math.degToRad;
+
+// rotate the icosahedron to each face, with the triangle pointing down
+const SIDES = [{ x: degToRad(70), y: 0, z: 0 }];
+
 export default function SpinningParticle() {
   const scalePct = 1;
 
@@ -19,7 +39,17 @@ export default function SpinningParticle() {
   const ref4 = useRef(null as any);
   const ref5 = useRef(null as any);
 
-  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
+  const [rotation, setRotation] = useState({
+    x: degToRad(50),
+    y: 0,
+    z: 0,
+  });
+
+  const animationStep = useAnimationStep();
+  // useEffect(() => {
+  //   setRotation({ x: animationStep, y: 1, z: 0 });
+  // }, [animationStep]);
+  console.log("🌟🚨 ~ SpinningParticle ~ animationStep", animationStep);
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -64,9 +94,6 @@ export default function SpinningParticle() {
     setMounted(true);
   });
 
-  const scrollTopPct = useStore((s) => s.scrollTopPct);
-  console.log("🌟🚨 ~ SpinningParticle ~ scrollTopPct", scrollTopPct);
-
   const zoomedIn = useStore((s) => s.isZoomed);
   const handleZoomIn = () => set({ isZoomed: true });
 
@@ -75,13 +102,7 @@ export default function SpinningParticle() {
     set({ isSpinning: !zoomedIn });
   }, [zoomedIn]);
 
-  const finalScale = useControl("finalScale", {
-    type: "number",
-    min: 0.1,
-    max: 10,
-    value: 4,
-  });
-  const scale = zoomedIn ? finalScale : mounted ? 1 : 0;
+  const scale = zoomedIn ? 4 : mounted ? 1 : 0;
 
   const [isWireframe, setIsWireframe] = useState(false);
 
@@ -113,7 +134,7 @@ export default function SpinningParticle() {
     [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
   );
   // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
-
+  const rotY = useControl("rotY");
   return (
     <animated.mesh
       scale={springProps.scale}
@@ -124,26 +145,18 @@ export default function SpinningParticle() {
       <animated.mesh ref={ref1}>
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <animated.meshPhysicalMaterial
+          {...COMMON_PROPS}
           opacity={springProps.opacity}
-          transparent={true}
           depthTest={true}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
         />
       </animated.mesh>
       {/* octahedron */}
       <mesh ref={ref2}>
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
+          {...COMMON_PROPS}
           opacity={0.4}
-          transparent={true}
           depthTest={true}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
         />
       </mesh>
       {/* icosahedron */}
@@ -151,17 +164,16 @@ export default function SpinningParticle() {
         <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
           <animated.meshPhysicalMaterial
-            wireframe={false}
+            {...COMMON_PROPS}
             opacity={springProps.opacity2}
-            transparent={true}
             depthTest={true}
             flatShading={false}
             roughness={springProps.roughness}
             vertexColors={false}
             metalness={0.9}
-            reflectivity={1}
           />
         </mesh>
+        <D20 scale={[d20scale, d20scale, d20scale]} rotation={[0, rotY, 0]} />
         {/* <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1.02, 0]} />
           {twentyTextures.map((texture) => (
@@ -172,60 +184,56 @@ export default function SpinningParticle() {
       <mesh ref={ref4}>
         <icosahedronBufferGeometry args={[scalePct * 4, 1]} />
         <meshPhysicalMaterial
+          {...COMMON_PROPS}
           renderOrder={3}
           color="tomato"
           wireframe={isWireframe}
           opacity={isWireframe ? 0.05 : 0.08}
-          transparent={true}
           depthTest={true}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
         />
       </mesh>
       <mesh ref={ref5}>
         <icosahedronBufferGeometry args={[scalePct * 14, 2]} />
         <meshPhysicalMaterial
+          {...COMMON_PROPS}
           renderOrder={0}
           opacity={isWireframe ? 0.03 : 0.04}
           wireframe={true}
-          transparent={true}
           depthTest={zoomedIn}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
         />
       </mesh>
       <mesh>
         <icosahedronBufferGeometry args={[scalePct * 100, 5]} />
         <meshPhysicalMaterial
+          {...COMMON_PROPS}
           color="rebeccapurple"
           opacity={0.018}
-          transparent={true}
-          depthTest={false}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
           wireframe={true}
         />
       </mesh>
       <mesh>
         <icosahedronBufferGeometry args={[scalePct * 600, 10]} />
         <meshPhysicalMaterial
+          {...COMMON_PROPS}
           color="cornflowerblue"
           opacity={0.01}
-          transparent={true}
-          depthTest={false}
-          flatShading={true}
-          roughness={0.4}
-          vertexColors={true}
-          reflectivity={1}
           wireframe={true}
         />
       </mesh>
     </animated.mesh>
   );
+}
+
+const NUM_STEPS = 20;
+
+function useAnimationStep() {
+  const scrollTopPct = useStore((s) => s.scrollTopPct);
+
+  const [animationStep, setAnimationStep] = useState(0);
+
+  useEffect(() => {
+    setAnimationStep(Math.round(scrollTopPct * NUM_STEPS));
+  }, [scrollTopPct]);
+
+  return animationStep;
 }

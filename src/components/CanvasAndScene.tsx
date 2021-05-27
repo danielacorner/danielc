@@ -8,7 +8,7 @@ import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
 import SpinScene from "./SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls } from "react-three-gui";
-import { ModifiedOrbitControls } from "./ModifiedOrbitControls";
+import { DeviceOrientationOrbitControls } from "./DeviceOrientationOrbitControls";
 
 export default function CanvasAndScene() {
   const windowSize = useWindowSize();
@@ -49,8 +49,11 @@ function Scene() {
 
   return (
     <>
-      {process.env.NODE_ENV === "development" && <OrbitControls />}
-      <ModifiedOrbitControls />
+      {process.env.NODE_ENV === "development" ? (
+        <OrbitControls />
+      ) : (
+        <DeviceOrientationOrbitControls />
+      )}
       <Stars count={1000} />
       <Environment background={false} path={"/"} preset={"night"} />
       <Sky

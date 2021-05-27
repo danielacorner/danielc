@@ -36,7 +36,7 @@ export const useStore = create<GlobalStateType>(
   (set): GlobalStateType => ({
     isSpinning: false,
     paused: false,
-    isZoomed: false,
+    isZoomed: true,
     isSoundOn: initialIsSoundOn,
     isPropertyAnimating: false,
     scrollTopPct: 0,

@@ -733,7 +733,8 @@ export type OrbitControlsProps = ReactThreeFiber.Overwrite<
   }
 >;
 
-export const ModifiedOrbitControls = React.forwardRef<
+/** rotates the scene around the center with device orientation */
+export const DeviceOrientationOrbitControls = React.forwardRef<
   OrbitControlsImpl,
   OrbitControlsProps
 >(({ camera, regress, enableDamping = true, ...restProps }, ref) => {
