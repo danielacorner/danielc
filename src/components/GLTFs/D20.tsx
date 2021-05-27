@@ -7,7 +7,7 @@ import { useGLTF } from "@react-three/drei";
 
 export default function Model(props) {
   const group = useRef();
-  const { nodes } = useGLTF("/models/D20.glb");
+  const { nodes } = useGLTF("/models/D20_draco.glb");
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -21,4 +21,4 @@ export default function Model(props) {
     </group>
   );
 }
-useGLTF.preload("/models/D20.glb");
+useGLTF.preload("/models/D20_draco.glb");
