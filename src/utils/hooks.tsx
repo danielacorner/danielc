@@ -121,8 +121,9 @@ export const usePreviousIf = (value, condition: boolean) => {
 export function useEventListener(
   eventName: string,
   handler: Function,
-  element: Element | Window = window
+  el?: Element | Window
 ) {
+  const element = el ? el : typeof window === "undefined" ? null : window;
   // Create a ref that stores handler
   const savedHandler = useRef(null as Function | null);
 

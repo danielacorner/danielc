@@ -7,6 +7,7 @@ type GlobalStateType = {
   /** mute the music */
   isSoundOn: boolean;
   isSpinning: boolean;
+  isScrollable: boolean;
   /** is the game paused / temperature === 0 */
   paused: boolean;
   /** if a property in the store is animating e.g. scale, can turn things on/off */
@@ -35,6 +36,7 @@ const initialIsSoundOn = (() => {
 export const useStore = create<GlobalStateType>(
   (set): GlobalStateType => ({
     isSpinning: false,
+    isScrollable: false,
     paused: false,
     isZoomed: false,
     isSoundOn: initialIsSoundOn,

@@ -81,12 +81,13 @@ export default function SpinningParticle() {
   const scale = zoomedIn ? 4.5 : mounted ? 1 : 0;
 
   const [isWireframe, setIsWireframe] = useState(false);
+  const [isD20Active, setIsD20Active] = useState(false);
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
     opacity: !zoomedIn ? 0.5 : 0.8,
     opacity2: !zoomedIn ? 0.2 : 0.8,
-    opacityD20: !zoomedIn ? 0 : 0.2,
+    opacityD20: !zoomedIn ? 0 : isD20Active ? 0.9 : 0.2,
     roughness: !zoomedIn ? 0.4 : 0,
     config: {
       mass: 20,
@@ -188,7 +189,7 @@ export default function SpinningParticle() {
           depthTest={true}
         />
       </mesh>
-      {/* icosahedron */}
+      {/* icosahedron + D20 */}
       <mesh ref={ref3}>
         <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
