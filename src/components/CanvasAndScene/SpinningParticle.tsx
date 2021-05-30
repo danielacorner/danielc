@@ -56,9 +56,10 @@ export default function SpinningParticle() {
   });
   const y = useControl("roty", { type: "number", value: 0, min: 0, max: 90 });
   const z = useControl("rotz", { type: "number", value: 0, min: 0, max: 90 });
-  const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
   const animationStep = useAnimationStep();
   const isD20Active = animationStep > 1;
+  // const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+  const rotation = useRotateWithScroll(x, y, z);
 
   const opacity = useControl("opacity", {
     value: 0.78,
@@ -78,7 +79,6 @@ export default function SpinningParticle() {
     min: 0.0,
     max: 1,
   });
-  // const rotation = useRotateWithScroll(x, y, z);
 
   const zoomedIn = useStore((s) => s.isZoomed);
 
