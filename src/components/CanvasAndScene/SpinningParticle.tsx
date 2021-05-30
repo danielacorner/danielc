@@ -7,6 +7,7 @@ import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import D20 from "../GLTFs/D20";
 import { useControl } from "react-three-gui";
+import { useAnimationStep } from "./useAnimationStep";
 
 const SPEED_Y = 0.5;
 const SPEED_X = 0.2;
@@ -35,6 +36,7 @@ const D20_ROTATION = {
 // rotate the icosahedron to each face, with the triangle pointing down
 const SIDES_ROTATIONS = [
   { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
+  { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
 ];
 
 export default function SpinningParticle() {
@@ -46,10 +48,36 @@ export default function SpinningParticle() {
   const ref4 = useRef(null as any);
   const ref5 = useRef(null as any);
 
-  const x = useControl("x", { type: "number", value: 70.81, min: 70, max: 72 });
-  const y = useControl("y", { type: "number", value: 0, min: 0, max: 90 });
-  const z = useControl("z", { type: "number", value: 0, min: 0, max: 90 });
+  const x = useControl("rotx", {
+    type: "number",
+    value: 70.81,
+    min: 70,
+    max: 72,
+  });
+  const y = useControl("roty", { type: "number", value: 0, min: 0, max: 90 });
+  const z = useControl("rotz", { type: "number", value: 0, min: 0, max: 90 });
   const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+  const animationStep = useAnimationStep();
+  const isD20Active = animationStep > 1;
+
+  const opacity = useControl("opacity", {
+    value: 0.78,
+    type: "number",
+    min: 0.04,
+    max: 1,
+  });
+  const metalness = useControl("metalness", {
+    value: 1,
+    type: "number",
+    min: 0,
+    max: 10,
+  });
+  const roughness = useControl("roughness", {
+    value: 0.07,
+    type: "number",
+    min: 0.0,
+    max: 1,
+  });
   // const rotation = useRotateWithScroll(x, y, z);
 
   const zoomedIn = useStore((s) => s.isZoomed);
@@ -71,13 +99,15 @@ export default function SpinningParticle() {
   const scale = zoomedIn ? 4.5 : mounted ? 1 : 0;
 
   const [isWireframe, setIsWireframe] = useState(false);
-  const [isD20Active, setIsD20Active] = useState(false);
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
-    opacity: !zoomedIn ? 0.5 : 0.8,
-    opacity2: !zoomedIn ? 0.2 : 0.8,
-    opacityD20: !zoomedIn ? 0 : isD20Active ? 0.9 : 0.2,
+    opacityTetrahedron: !zoomedIn ? 0.8 : 0.8,
+    opacityIcosahedron: !zoomedIn ? 0.2 : isD20Active ? 0.2 : 0.8,
+    opacityD20: !zoomedIn ? 0.3 : isD20Active ? opacity : 0.2,
+    opacityInnerIcosahedron: !zoomedIn ? 0 : isD20Active ? 0.9 : 0,
+    metalnessD20: !zoomedIn ? 4 : isD20Active ? metalness : 30,
+    roughnessD20: !zoomedIn ? 0.5 : isD20Active ? roughness : 0.07,
     roughness: !zoomedIn ? 0.4 : 0,
     config: {
       mass: 20,
@@ -85,76 +115,16 @@ export default function SpinningParticle() {
       friction: zoomedIn ? 70 : 18,
       clamp: false,
     },
-    // // unmount the particle when it's fully decayed
     onRest: (spring) => {
       if (zoomedIn) {
         setIsWireframe(true);
         set({ isScrollable: true });
       }
     },
-    // onRest: (spring) => {
-    //     unmount();
-    //   }
-    // },
   });
 
-  // const twentyTextures = useTexture(
-  //   [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
-  // );
-  // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
+  const d20scale = 0.08;
 
-  // const rotXDeg = useControl("rotX", {
-  //   value: D20_ROTATION.x,
-  //   type: "number",
-  //   min: -10,
-  //   max: 10,
-  // });
-  // const rotX = degToRad(rotXDeg);
-
-  // const rotYDeg = useControl("rotY", {
-  //   value: D20_ROTATION.y,
-  //   type: "number",
-  //   min: 50,
-  //   max: 60,
-  // });
-  // const rotY = degToRad(rotYDeg);
-
-  // const rotZDeg = useControl("rotZ", {
-  //   value: D20_ROTATION.z,
-  //   type: "number",
-  //   min: 50,
-  //   max: 60,
-  // });
-  // const rotZ = degToRad(rotZDeg);
-
-  const d20scale = useControl("d20scale", {
-    value: 0.08,
-    type: "number",
-    min: 0.04,
-    max: 0.16,
-  });
-  // const texture = useLoader(THREE.TextureLoader, [
-  //   `https://picsum.photos/50/50`,
-  // ]);
-  // const texture = useTexture([`https://picsum.photos/50/50`]);
-  // const opacity = useControl("opacity", {
-  //   value: 0.3,
-  //   type: "number",
-  //   min: 0.04,
-  //   max: 0.94,
-  // });
-  // const metalness = useControl("metalness", {
-  //   value: 123.33,
-  //   type: "number",
-  //   min: 0,
-  //   max: 1000,
-  // });
-  // const roughness = useControl("roughness", {
-  //   value: 0.07,
-  //   type: "number",
-  //   min: 0.0,
-  //   max: 1,
-  // });
   return (
     <animated.mesh
       scale={springProps.scale}
@@ -166,7 +136,7 @@ export default function SpinningParticle() {
         <tetrahedronBufferGeometry args={[scalePct * 0.25, 0]} />
         <animated.meshPhysicalMaterial
           {...COMMON_MATERIAL_PROPS}
-          opacity={springProps.opacity}
+          opacity={springProps.opacityTetrahedron}
           depthTest={true}
         />
       </animated.mesh>
@@ -175,44 +145,51 @@ export default function SpinningParticle() {
         <octahedronBufferGeometry args={[scalePct * 0.5, 0]} />
         <meshPhysicalMaterial
           {...COMMON_MATERIAL_PROPS}
-          opacity={0.4}
+          opacity={0.6}
           depthTest={true}
         />
       </mesh>
       {/* icosahedron + D20 */}
-      <mesh ref={ref3}>
+      <mesh ref={ref3} depthTest={true}>
         <mesh>
           <icosahedronBufferGeometry args={[scalePct * 1, 0]} />
           <animated.meshPhysicalMaterial
             {...COMMON_MATERIAL_PROPS}
-            opacity={springProps.opacity2}
-            depthTest={true}
+            opacity={springProps.opacityIcosahedron}
+            depthTest={false}
             flatShading={false}
             roughness={springProps.roughness}
             vertexColors={false}
             metalness={0.9}
+            receiveShadow={true}
+            castShadow={true}
           />
         </mesh>
+        {/* TODO: need to fade in a non-transparent one too when isD20Active??? */}
         <D20
           scale={[d20scale, d20scale, d20scale]}
           rotation={[D20_ROTATION.x, D20_ROTATION.y, D20_ROTATION.z]}
           // rotation={[rotX, rotY, rotZ]}
+          depthTest={true}
+          depthWrite={true}
+          receiveShadow={true}
+          castShadow={true}
         >
-          <animated.meshStandardMaterial
+          <animated.meshPhysicalMaterial
             {...COMMON_MATERIAL_PROPS}
-            transparent={true}
+            // transparent={true}
+            depthTest={true}
+            depthWrite={true}
             opacity={springProps.opacityD20}
-            metalness={123.33}
-            roughness={0.07}
+            metalness={springProps.metalnessD20}
+            roughness={springProps.roughnessD20}
+            clearcoat={0.13}
+            clearcoatRoughness={0.4}
+            color="white"
           />
+          {/* <meshStandardMaterial color="white" /> */}
           {/* <meshStandardMaterial map={texture} attach="material" /> */}
         </D20>
-        {/* <mesh>
-          <icosahedronBufferGeometry args={[scalePct * 1.02, 0]} />
-          {twentyTextures.map((texture) => (
-            <meshStandardMaterial map={texture} attach="material" />
-          ))}
-        </mesh> */}
       </mesh>
       <mesh ref={ref4}>
         <icosahedronBufferGeometry args={[scalePct * 4, 1]} />
@@ -305,27 +282,14 @@ function useSpinObjects(
   });
 }
 
-const NUM_STEPS = 20;
-
-function useAnimationStep() {
-  const scrollTopPct = useStore((s) => s.scrollTopPct);
-
-  const [animationStep, setAnimationStep] = useState(0);
-
-  useEffect(() => {
-    setAnimationStep(Math.round(scrollTopPct * NUM_STEPS));
-  }, [scrollTopPct]);
-
-  return animationStep;
-}
-
 function useRotateWithScroll(x, y, z) {
+  const animationStep = useAnimationStep();
+
   const [rotation, setRotation] = useState({
     x: degToRad(x),
     y: degToRad(y),
     z: degToRad(z),
   });
-  const animationStep = useAnimationStep();
   useEffect(() => {
     setRotation(SIDES_ROTATIONS[animationStep] || SIDES_ROTATIONS[0]);
   }, [animationStep]);

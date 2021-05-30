@@ -222,3 +222,44 @@ export const useInterval = ({
     };
   }, [delay]);
 };
+
+// source: https://github.com/kentcdodds/react-hooks
+
+/**
+ *
+ * @param {String} key The key to set in localStorage for this value
+ * @param {Object} defaultValue The value to use if it is not already in localStorage
+ * @param {{serialize: Function, deserialize: Function}} options The serialize and deserialize functions to use (defaults to JSON.stringify and JSON.parse respectively)
+ */
+
+export function useLocalStorageState(
+  key: string,
+  defaultValue: any = "",
+  { serialize = JSON.stringify, deserialize = JSON.parse }: any = {}
+) {
+  const [state, setState] = useState(() => {
+    const valueInLocalStorage = window.localStorage.getItem(key);
+    if (valueInLocalStorage) {
+      return deserialize(valueInLocalStorage);
+    }
+    return typeof defaultValue === "function"
+      ? (defaultValue as Function)()
+      : defaultValue;
+  });
+
+  const prevKeyRef = useRef(key);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const prevKey = prevKeyRef.current;
+    if (prevKey !== key) {
+      window.localStorage.removeItem(prevKey);
+    }
+    prevKeyRef.current = key;
+    window.localStorage.setItem(key, serialize(state));
+  }, [key, state, serialize]);
+
+  return [state, setState];
+}

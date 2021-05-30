@@ -10,15 +10,15 @@ export default function Model(props) {
   const { nodes } = useGLTF("/models/D20_draco.glb");
 
   return (
-    <group ref={group} {...props} dispose={null}>
-      <mesh
-        material={nodes.Mesh_0.material}
-        geometry={nodes.Mesh_0.geometry}
-        position={[0, 0, 0]}
-      >
-        {props.children}
-      </mesh>
-    </group>
+    <mesh
+      ref={group}
+      {...props}
+      material={nodes.Mesh_0.material}
+      geometry={nodes.Mesh_0.geometry}
+      position={[0, 0, 0]}
+    >
+      {props.children}
+    </mesh>
   );
 }
 useGLTF.preload("/models/D20_draco.glb");

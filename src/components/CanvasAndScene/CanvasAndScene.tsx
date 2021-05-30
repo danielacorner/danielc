@@ -26,11 +26,11 @@ export default function CanvasAndScene() {
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
         }}
+        shadowMap={true}
         gl={{ antialias: false, alpha: false }}
         {...{ camera: { fov: 75, position: [0, 0, 15] } }}
         style={{ height: windowSize.height, width: windowSize.width }}
       >
-        <Lighting />
         <SpinScene>
           <Physics {...PHYSICS_PROPS}>
             <mesh scale={[1, 1, 1]}>
@@ -38,6 +38,7 @@ export default function CanvasAndScene() {
             </mesh>
           </Physics>
         </SpinScene>
+        <Lighting />
       </Controls.Canvas>
       {process.env.NODE_ENV !== "production" && <Controls />}
     </Controls.Provider>
@@ -49,9 +50,9 @@ function Scene() {
   return (
     <>
       {process.env.NODE_ENV === "development" ? (
-        // <OrbitControls />
-        <DeviceOrientationOrbitControls />
+        <OrbitControls />
       ) : (
+        // <DeviceOrientationOrbitControls />
         <DeviceOrientationOrbitControls />
       )}
       <Stars count={1000} />
