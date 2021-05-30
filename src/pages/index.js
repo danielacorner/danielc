@@ -1,7 +1,7 @@
 import * as React from "react";
 import Layout from "../components/Layout";
 import styled from "styled-components/macro";
-import CanvasAndScene from "../components/CanvasAndScene";
+import CanvasAndScene from "../components/CanvasAndScene/CanvasAndScene";
 // import { useStore } from "../store";
 // import InvisibleScrollHandler from "../components/InvisibleScrollHandler";
 

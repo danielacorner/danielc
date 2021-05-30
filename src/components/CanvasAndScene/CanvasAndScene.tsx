@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useWindowSize, useInterval } from "../utils/hooks";
+import { useWindowSize, useInterval } from "../../utils/hooks";
 import * as THREE from "three";
 import { Environment, OrbitControls, Sky, Stars } from "@react-three/drei";
-import { Lighting } from "./Lighting";
+import { Lighting } from "../Lighting";
 import { Physics } from "@react-three/cannon";
-import { PHYSICS_PROPS } from "./PHYSICS_PROPS";
-import SpinScene from "./SpinScene";
+import { PHYSICS_PROPS } from "../PHYSICS_PROPS";
+import SpinScene from "../SpinScene";
 import SpinningParticle from "./SpinningParticle";
 import { Controls, useControl } from "react-three-gui";
 import { DeviceOrientationOrbitControls } from "./DeviceOrientationOrbitControls";
@@ -44,15 +44,13 @@ export default function CanvasAndScene() {
   );
 }
 
-const SECONDS_IN_DAY = 24 * 60 * 60;
-const TURBIDITY = { max: -50, min: 100 };
-
 function Scene() {
   const turbidity = useGetTurbidityByTimeOfDay();
   return (
     <>
       {process.env.NODE_ENV === "development" ? (
-        <OrbitControls />
+        // <OrbitControls />
+        <DeviceOrientationOrbitControls />
       ) : (
         <DeviceOrientationOrbitControls />
       )}
@@ -68,6 +66,9 @@ function Scene() {
     </>
   );
 }
+
+const SECONDS_IN_DAY = 24 * 60 * 60;
+const TURBIDITY = { max: -50, min: 100 };
 
 function useGetTurbidityByTimeOfDay() {
   const date = new Date();

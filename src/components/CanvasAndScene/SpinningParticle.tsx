@@ -1,11 +1,11 @@
 import { useFrame, useLoader } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
-import { useStore } from "../store";
-import { useMount } from "../utils/hooks";
+import { useStore } from "../../store";
+import { useMount } from "../../utils/hooks";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import D20 from "./GLTFs/D20";
+import D20 from "../GLTFs/D20";
 import { useControl } from "react-three-gui";
 
 const SPEED_Y = 0.5;
@@ -107,9 +107,9 @@ export default function SpinningParticle() {
     // },
   });
 
-  const twentyTextures = useTexture(
-    [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
-  );
+  // const twentyTextures = useTexture(
+  //   [...Array(20)].map((_, idx) => `https://picsum.photos/5${idx % 10}/50`)
+  // );
   // const [texture1] = useTexture(["/textures/dice_1.jpeg"]);
 
   // const rotXDeg = useControl("rotX", {
