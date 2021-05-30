@@ -50,17 +50,7 @@ export default function SpinningParticle() {
   const y = useControl("y", { type: "number", value: 0, min: 0, max: 90 });
   const z = useControl("z", { type: "number", value: 0, min: 0, max: 90 });
   const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
-  // const [rotation, setRotation] = useState({
-  //   x: degToRad(x),
-  //   y: degToRad(y),
-  //   z: degToRad(z),
-  // });
-
-  const animationStep = useAnimationStep();
-  // useEffect(() => {
-  //   setRotation({ x: animationStep, y: 1, z: 0 });
-  // }, [animationStep]);
-  console.log("🌟🚨 ~ SpinningParticle ~ animationStep", animationStep);
+  // const rotation = useRotateWithScroll(x, y, z);
 
   const zoomedIn = useStore((s) => s.isZoomed);
 
@@ -327,4 +317,18 @@ function useAnimationStep() {
   }, [scrollTopPct]);
 
   return animationStep;
+}
+
+function useRotateWithScroll(x, y, z) {
+  const [rotation, setRotation] = useState({
+    x: degToRad(x),
+    y: degToRad(y),
+    z: degToRad(z),
+  });
+  const animationStep = useAnimationStep();
+  useEffect(() => {
+    setRotation(SIDES_ROTATIONS[animationStep] || SIDES_ROTATIONS[0]);
+  }, [animationStep]);
+  console.log("🌟🚨 ~ SpinningParticle ~ animationStep", animationStep);
+  return rotation;
 }
