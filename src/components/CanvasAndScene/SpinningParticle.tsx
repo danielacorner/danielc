@@ -267,8 +267,6 @@ export default function SpinningParticle() {
   );
 }
 
-const NUM_STEPS = 20;
-
 function useSpinObjects(
   ref1: React.MutableRefObject<any>,
   ref2: React.MutableRefObject<any>,
@@ -316,6 +314,8 @@ function useSpinObjects(
       ref5.current.rotation.y + Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
   });
 }
+
+const NUM_STEPS = 20;
 
 function useAnimationStep() {
   const scrollTopPct = useStore((s) => s.scrollTopPct);
