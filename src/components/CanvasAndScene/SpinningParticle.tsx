@@ -1,10 +1,10 @@
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring/three";
 import { useStore } from "../../store";
 import { useMount } from "../../utils/hooks";
-import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
+import D20_STAR from "../GLTFs/D20_star";
 import D20 from "../GLTFs/D20";
 import { useControl } from "react-three-gui";
 import { useAnimationStep } from "./useAnimationStep";
@@ -32,6 +32,11 @@ const D20_ROTATION = {
   y: degToRad(57.6),
   z: degToRad(54.8),
 };
+const D20_STAR_ROTATION = {
+  x: degToRad(69.03),
+  y: degToRad(-0.02),
+  z: degToRad(-0.2),
+};
 
 // rotate the icosahedron to each face, with the triangle pointing down
 const SIDES_ROTATIONS = [
@@ -50,17 +55,28 @@ export default function SpinningParticle() {
 
   const x = useControl("rotx", {
     type: "number",
-    value: 70.81,
-    min: 70,
-    max: 72,
+    value: 69.03,
+    min: 69,
+    max: 70,
   });
-  const y = useControl("roty", { type: "number", value: 0, min: 0, max: 90 });
-  const z = useControl("rotz", { type: "number", value: 0, min: 0, max: 90 });
+  const y = useControl("roty", {
+    type: "number",
+    value: -0.02,
+    min: -0.5,
+    max: 0.5,
+  });
+  const z = useControl("rotz", {
+    type: "number",
+    value: -0.2,
+    min: -0.5,
+    max: 0.5,
+  });
   const animationStep = useAnimationStep();
   const isD20Active = animationStep > 1;
-  // const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+  // const D20rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
   const rotation = useRotateWithScroll(x, y, z);
 
+  // TODO: alphaMap for the side facing forward? https://threejs.org/docs/#api/en/materials/MeshBasicMaterial.alphaMap
   const opacity = useControl("opacity", {
     value: 0.78,
     type: "number",
@@ -123,7 +139,13 @@ export default function SpinningParticle() {
     },
   });
 
-  const d20scale = 0.08;
+  const d20Scale = 0.08;
+  const d20StarScale = useControl("d20scale", {
+    type: "number",
+    min: 0.04,
+    max: 0.07,
+    value: 0.055,
+  });
 
   return (
     <animated.mesh
@@ -166,10 +188,9 @@ export default function SpinningParticle() {
           />
         </mesh>
         {/* TODO: need to fade in a non-transparent one too when isD20Active??? */}
-        <D20
-          scale={[d20scale, d20scale, d20scale]}
+        {/* <D20
+          scale={[d20Scale, d20Scale, d20Scale]}
           rotation={[D20_ROTATION.x, D20_ROTATION.y, D20_ROTATION.z]}
-          // rotation={[rotX, rotY, rotZ]}
           depthTest={true}
           depthWrite={true}
           receiveShadow={true}
@@ -187,9 +208,34 @@ export default function SpinningParticle() {
             clearcoatRoughness={0.4}
             color="white"
           />
+        </D20> */}
+        <D20_STAR
+          scale={[d20StarScale, d20StarScale, d20StarScale]}
+          rotation={[
+            D20_STAR_ROTATION.x,
+            D20_STAR_ROTATION.y,
+            D20_STAR_ROTATION.z,
+          ]}
+          depthTest={true}
+          depthWrite={true}
+          castShadow={true}
+          receiveShadow={true}
+        >
+          <animated.meshPhysicalMaterial
+            {...COMMON_MATERIAL_PROPS}
+            transparent={true}
+            depthTest={true}
+            depthWrite={true}
+            opacity={springProps.opacityD20}
+            metalness={springProps.metalnessD20}
+            roughness={springProps.roughnessD20}
+            clearcoat={0.13}
+            clearcoatRoughness={0.4}
+            color="red"
+          />
           {/* <meshStandardMaterial color="white" /> */}
           {/* <meshStandardMaterial map={texture} attach="material" /> */}
-        </D20>
+        </D20_STAR>
       </mesh>
       <mesh ref={ref4}>
         <icosahedronBufferGeometry args={[scalePct * 4, 1]} />

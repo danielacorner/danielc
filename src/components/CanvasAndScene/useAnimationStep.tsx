@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "../../store";
 import { useLocalStorageState } from "../../utils/hooks";
 
-const NUM_STEPS = 22; // zoomed out, zoomed in, 20 steps
+const NUM_STEPS = 21;
 
 export function useAnimationStep() {
   const [animationStep, setAnimationStep] = useLocalStorageState(

@@ -4,6 +4,7 @@ import { useFrame, useThree } from "react-three-fiber";
 import { useControl } from "react-three-gui";
 import { useAnimationStep } from "./CanvasAndScene/useAnimationStep";
 import { useSpring, animated } from "react-spring/three";
+import { useStore } from "../store";
 
 export function Lighting() {
   return (
@@ -32,6 +33,7 @@ function LightFollowsMouse() {
   const spotlightRef = useRef(null as any);
   const box = useRef(null as any);
   const spotlightBox = useRef(null as any);
+  const isZoomed = useStore((s) => s.isZoomed);
 
   const { viewport, mouse } = useThree();
 
@@ -74,17 +76,39 @@ function LightFollowsMouse() {
 
   const springProps = useSpring({
     spotlightIntensity: isD20Active ? 50 : -15,
+    pointlightIntensity: !isZoomed ? 3 : 6,
   });
-
+  const z = useControl("z", { type: "number", min: -10, max: 5, value: 0 });
   return (
     <>
-      {/* // light that gets emitted in all directions */}
-      <pointLight
-        ref={light}
+      {/* // pointlight = light that gets emitted in all directions */}
+      <animated.pointLight
+        ref={light} /* this one follows the mouse */
         decay={0}
         distance={0}
-        intensity={6}
+        intensity={springProps.pointlightIntensity}
+        color="white"
+      />
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={1}
         color="lightblue"
+        position={[-2, -8, 5]}
+      />
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={3}
+        color="red"
+        position={[1, 8, -5]}
+      />
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={2}
+        color="limegreen"
+        position={[3, -8, -6]}
       />
       <animated.spotLight
         intensity={springProps.spotlightIntensity}
