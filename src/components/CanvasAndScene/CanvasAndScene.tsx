@@ -50,9 +50,9 @@ function Scene() {
   return (
     <>
       {process.env.NODE_ENV === "development" ? (
-        <OrbitControls />
+        // <OrbitControls />
+        <DeviceOrientationOrbitControls />
       ) : (
-        // <DeviceOrientationOrbitControls />
         <DeviceOrientationOrbitControls />
       )}
       <Stars count={1000} />

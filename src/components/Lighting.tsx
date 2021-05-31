@@ -77,7 +77,7 @@ function LightFollowsMouse() {
 
   const springProps = useSpring({
     spotlightIntensity: isD20Active ? 10 : -15,
-    spotlight2Intensity: isD20Active ? 40 : 0,
+    spotlight2Intensity: isD20Active ? 400 : 0,
     pointlightIntensity: !isZoomed ? 3 : 6,
   });
   const z = useControl("z", { type: "number", min: -10, max: 5, value: 0 });
@@ -106,10 +106,9 @@ function LightFollowsMouse() {
       </mesh>
       <animated.pointLight
         intensity={springProps.spotlight2Intensity}
-        angle={Math.PI / 6}
-        position={[-8, 7, 8]}
+        position={[-1, 2.5, 9]}
         castShadow={true}
-        color="white"
+        color="whitesmoke"
       />
     </>
   );

@@ -96,9 +96,9 @@ export default function SpinningParticle() {
     max: 1,
   });
 
-  const zoomedIn = useStore((s) => s.isZoomed);
+  const isZoomed = useStore((s) => s.isZoomed);
 
-  useSpinObjects(ref1, ref2, zoomedIn, ref3, rotation, ref4, ref5);
+  useSpinObjects(ref1, ref2, isZoomed, ref3, rotation, ref4, ref5);
 
   const [mounted, setMounted] = useState(false);
   useMount(() => {
@@ -109,30 +109,30 @@ export default function SpinningParticle() {
 
   const set = useStore((s) => s.set);
   useEffect(() => {
-    set({ isSpinning: !zoomedIn });
-  }, [zoomedIn]);
+    set({ isSpinning: !isZoomed });
+  }, [isZoomed]);
 
-  const scale = zoomedIn ? 4.5 : mounted ? 1 : 0;
+  const scale = isZoomed ? 4.5 : mounted ? 1 : 0;
 
   const [isWireframe, setIsWireframe] = useState(false);
 
   const springProps = useSpring({
     scale: [scale, scale, scale],
-    opacityTetrahedron: !zoomedIn ? 0.8 : 0.8,
-    opacityIcosahedron: !zoomedIn ? 0.2 : isD20Active ? 0.2 : 0.8,
-    opacityD20: !zoomedIn ? 0.3 : isD20Active ? 0.8 : 0.2,
-    opacityInnerIcosahedron: !zoomedIn ? 0 : isD20Active ? 0.9 : 0,
-    metalnessD20: !zoomedIn ? 4 : isD20Active ? metalness : 30,
-    roughnessD20: !zoomedIn ? 0.5 : isD20Active ? roughness : 0.07,
-    roughness: !zoomedIn ? 0.4 : 0,
+    opacityTetrahedron: !isZoomed ? 0.8 : 0.8,
+    opacityIcosahedron: !isZoomed ? 0.2 : isD20Active ? 0.2 : 0.8,
+    opacityD20: !isZoomed ? 0.2 : isD20Active ? 0.8 : 0.2,
+    opacityInnerIcosahedron: !isZoomed ? 0 : isD20Active ? 0.9 : 0,
+    metalnessD20: !isZoomed ? 4 : isD20Active ? metalness : 30,
+    roughnessD20: !isZoomed ? 0.5 : isD20Active ? roughness : 0.07,
+    roughness: !isZoomed ? 0.4 : 0,
     config: {
       mass: 20,
-      tension: zoomedIn ? 160 : 80,
-      friction: zoomedIn ? 70 : 18,
+      tension: isZoomed ? 160 : 80,
+      friction: isZoomed ? 70 : 18,
       clamp: false,
     },
     onRest: (spring) => {
-      if (zoomedIn) {
+      if (isZoomed) {
         setIsWireframe(true);
         set({ isScrollable: true });
       }
@@ -213,22 +213,26 @@ export default function SpinningParticle() {
             D20_STAR_ROTATION.y,
             D20_STAR_ROTATION.z,
           ]}
-          depthTest={true}
-          depthWrite={true}
-          castShadow={true}
-          receiveShadow={true}
         >
-          <animated.meshPhysicalMaterial
+          {/* <animated.meshLambertMaterial
             {...COMMON_MATERIAL_PROPS}
-            transparent={true}
+            transparent={false}
             castShadow={true}
             depthTest={true}
+            depthWrite={true}
+          /> */}
+          <animated.meshPhysicalMaterial
+            {...COMMON_MATERIAL_PROPS}
+            transparent={!isD20Active}
+            depthTest={isD20Active}
+            castShadow={true}
             depthWrite={true}
             opacity={springProps.opacityD20}
             metalness={springProps.metalnessD20}
             roughness={springProps.roughnessD20}
             clearcoat={0.13}
             clearcoatRoughness={0.4}
+            color="silver"
           />
         </D20_STAR>
       </mesh>
@@ -250,7 +254,7 @@ export default function SpinningParticle() {
           renderOrder={0}
           opacity={isWireframe ? 0.03 : 0.04}
           wireframe={true}
-          depthTest={zoomedIn}
+          depthTest={isZoomed}
         />
       </mesh>
       <mesh>
@@ -278,7 +282,7 @@ export default function SpinningParticle() {
 function useSpinObjects(
   ref1: React.MutableRefObject<any>,
   ref2: React.MutableRefObject<any>,
-  zoomedIn: boolean,
+  isZoomed: boolean,
   ref3: React.MutableRefObject<any>,
   rotation: { x: any; y: number; z: number },
   ref4: React.MutableRefObject<any>,
@@ -297,7 +301,7 @@ function useSpinObjects(
     ref2.current.rotation.y =
       ref2.current.rotation.y - Math.cos(time * SPEED_X) * AMPLITUDE_X_INV;
 
-    if (zoomedIn) {
+    if (isZoomed) {
       // move slowly from [x,y,z] to rotation
       // e.g. 5 -> 2
       // 5 = 5 + (2-5)/2

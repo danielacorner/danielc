@@ -11,12 +11,15 @@ export default function Model(props) {
   const { nodes, materials } = useGLTF("/models/D20_star_draco.glb");
   useAddShadowsToGltf(group);
   return (
-    <group ref={group} {...props} dispose={null}>
+    <group {...props} dispose={null}>
       <mesh
-        material={materials["default"]}
+        ref={group}
+        // material={materials["default"]}
         geometry={nodes.Mesh_0.geometry}
         position={[0, 0, 0]}
-      />
+      >
+        {props.children}
+      </mesh>
     </group>
   );
 }
