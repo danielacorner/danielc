@@ -5,6 +5,7 @@ import { useControl } from "react-three-gui";
 import { useAnimationStep } from "./CanvasAndScene/useAnimationStep";
 import { useSpring, animated } from "react-spring/three";
 import { useStore } from "../store";
+import { useMount } from "../utils/hooks";
 
 export function Lighting() {
   return (
@@ -75,48 +76,26 @@ function LightFollowsMouse() {
   // });
 
   const springProps = useSpring({
-    spotlightIntensity: isD20Active ? 50 : -15,
+    spotlightIntensity: isD20Active ? 10 : -15,
+    spotlight2Intensity: isD20Active ? 40 : 0,
     pointlightIntensity: !isZoomed ? 3 : 6,
   });
   const z = useControl("z", { type: "number", min: -10, max: 5, value: 0 });
   return (
     <>
-      {/* // pointlight = light that gets emitted in all directions */}
+      <RGBLights />
       <animated.pointLight
         ref={light} /* this one follows the mouse */
         decay={0}
         distance={0}
         intensity={springProps.pointlightIntensity}
+        castShadow={true}
         color="white"
-      />
-      <pointLight
-        decay={0}
-        distance={0}
-        intensity={1}
-        color="lightblue"
-        position={[-2, -8, 5]}
-      />
-      <pointLight
-        decay={0}
-        distance={0}
-        intensity={3}
-        color="red"
-        position={[1, 8, -5]}
-      />
-      <pointLight
-        decay={0}
-        distance={0}
-        intensity={2}
-        color="limegreen"
-        position={[3, -8, -6]}
       />
       <animated.spotLight
         intensity={springProps.spotlightIntensity}
-        // angle={Math.PI / 2}
-        ref={spotlightRef}
+        ref={spotlightRef} /* this one follows the mouse*/
         castShadow={true}
-        shadow-mapSize-height={512}
-        shadow-mapSize-width={512}
         color="white"
       />
       <mesh depthTest={true}>
@@ -125,6 +104,44 @@ function LightFollowsMouse() {
           <Box position={spotlightBox} />
         )}
       </mesh>
+      <animated.pointLight
+        intensity={springProps.spotlight2Intensity}
+        angle={Math.PI / 6}
+        position={[-8, 7, 8]}
+        castShadow={true}
+        color="white"
+      />
+    </>
+  );
+}
+
+function RGBLights() {
+  return (
+    <>
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={1}
+        color="lightblue"
+        castShadow={true}
+        position={[-2, -8, 5]}
+      />
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={3}
+        color="red"
+        castShadow={true}
+        position={[1, 8, -5]}
+      />
+      <pointLight
+        decay={0}
+        distance={0}
+        intensity={2}
+        color="limegreen"
+        castShadow={true}
+        position={[3, -8, -6]}
+      />
     </>
   );
 }

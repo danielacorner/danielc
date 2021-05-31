@@ -17,10 +17,10 @@ const AMPLITUDE_X_INV = 0.01;
 const COMMON_MATERIAL_PROPS = {
   transparent: true,
   wireframe: false,
-  depthTest: false,
-  flatShading: true,
+  depthTest: true,
+  flatShading: false,
   roughness: 0.4,
-  vertexColors: true,
+  vertexColors: false,
   reflectivity: 1,
 };
 
@@ -77,12 +77,12 @@ export default function SpinningParticle() {
   const rotation = useRotateWithScroll(x, y, z);
 
   // TODO: alphaMap for the side facing forward? https://threejs.org/docs/#api/en/materials/MeshBasicMaterial.alphaMap
-  const opacity = useControl("opacity", {
-    value: 0.78,
-    type: "number",
-    min: 0.04,
-    max: 1,
-  });
+  // const opacity = useControl("opacity", {
+  //   value: 0.78,
+  //   type: "number",
+  //   min: 0.04,
+  //   max: 1,
+  // });
   const metalness = useControl("metalness", {
     value: 1,
     type: "number",
@@ -120,7 +120,7 @@ export default function SpinningParticle() {
     scale: [scale, scale, scale],
     opacityTetrahedron: !zoomedIn ? 0.8 : 0.8,
     opacityIcosahedron: !zoomedIn ? 0.2 : isD20Active ? 0.2 : 0.8,
-    opacityD20: !zoomedIn ? 0.3 : isD20Active ? opacity : 0.2,
+    opacityD20: !zoomedIn ? 0.3 : isD20Active ? 0.8 : 0.2,
     opacityInnerIcosahedron: !zoomedIn ? 0 : isD20Active ? 0.9 : 0,
     metalnessD20: !zoomedIn ? 4 : isD20Active ? metalness : 30,
     roughnessD20: !zoomedIn ? 0.5 : isD20Active ? roughness : 0.07,
@@ -178,10 +178,7 @@ export default function SpinningParticle() {
           <animated.meshPhysicalMaterial
             {...COMMON_MATERIAL_PROPS}
             opacity={springProps.opacityIcosahedron}
-            depthTest={false}
-            flatShading={false}
             roughness={springProps.roughness}
-            vertexColors={false}
             metalness={0.9}
             receiveShadow={true}
             castShadow={true}
@@ -224,6 +221,7 @@ export default function SpinningParticle() {
           <animated.meshPhysicalMaterial
             {...COMMON_MATERIAL_PROPS}
             transparent={true}
+            castShadow={true}
             depthTest={true}
             depthWrite={true}
             opacity={springProps.opacityD20}
@@ -231,10 +229,7 @@ export default function SpinningParticle() {
             roughness={springProps.roughnessD20}
             clearcoat={0.13}
             clearcoatRoughness={0.4}
-            color="red"
           />
-          {/* <meshStandardMaterial color="white" /> */}
-          {/* <meshStandardMaterial map={texture} attach="material" /> */}
         </D20_STAR>
       </mesh>
       <mesh ref={ref4}>
