@@ -38,9 +38,12 @@ const D20_STAR_ROTATION = {
   z: degToRad(-0.2),
 };
 
-// rotate the icosahedron to each face, with the triangle pointing down
+// rotate the icosahedron to each face, from 20 to 1
 const SIDES_ROTATIONS = [
-  { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
+  { x: degToRad(88.8), y: degToRad(224.4), z: degToRad(252) }, // 20
+  { x: degToRad(224.4), y: degToRad(144), z: degToRad(254.4) }, // 19
+  { x: degToRad(349.2), y: degToRad(163.2), z: degToRad(25.2) }, // 18
+  { x: degToRad(349.2), y: degToRad(163.2), z: degToRad(25.2) }, // 17
   { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
 ];
 
@@ -56,41 +59,40 @@ export default function SpinningParticle() {
   const x = useControl("rotx", {
     type: "number",
     value: 69.03,
-    min: 69,
-    max: 70,
+    min: 0,
+    max: 360,
   });
   const y = useControl("roty", {
     type: "number",
     value: -0.02,
-    min: -0.5,
-    max: 0.5,
+    min: 0,
+    max: 360,
   });
   const z = useControl("rotz", {
     type: "number",
     value: -0.2,
-    min: -0.5,
-    max: 0.5,
+    min: 0,
+    max: 360,
   });
   const animationStep = useAnimationStep();
   const isD20Active = animationStep > 1;
-  // const D20rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
-  const rotation = useRotateWithScroll(x, y, z);
+  const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+  // const rotation = useRotateWithScroll(x, y, z);
 
-  // TODO: alphaMap for the side facing forward? https://threejs.org/docs/#api/en/materials/MeshBasicMaterial.alphaMap
-  // const opacity = useControl("opacity", {
+  // const opacity = useControl("opacity", { // ? not working
   //   value: 0.78,
   //   type: "number",
   //   min: 0.04,
   //   max: 1,
   // });
   const metalness = useControl("metalness", {
-    value: 1,
+    value: 0.99,
     type: "number",
-    min: 0,
-    max: 10,
+    min: 0.5,
+    max: 1,
   });
   const roughness = useControl("roughness", {
-    value: 0.07,
+    value: 0.15,
     type: "number",
     min: 0.0,
     max: 1,
@@ -140,12 +142,7 @@ export default function SpinningParticle() {
   });
 
   const d20Scale = 0.08;
-  const d20StarScale = useControl("d20scale", {
-    type: "number",
-    min: 0.04,
-    max: 0.07,
-    value: 0.055,
-  });
+  const d20StarScale = 0.055;
 
   return (
     <animated.mesh
@@ -214,13 +211,6 @@ export default function SpinningParticle() {
             D20_STAR_ROTATION.z,
           ]}
         >
-          {/* <animated.meshLambertMaterial
-            {...COMMON_MATERIAL_PROPS}
-            transparent={false}
-            castShadow={true}
-            depthTest={true}
-            depthWrite={true}
-          /> */}
           <animated.meshPhysicalMaterial
             {...COMMON_MATERIAL_PROPS}
             transparent={!isD20Active}
@@ -230,7 +220,7 @@ export default function SpinningParticle() {
             opacity={springProps.opacityD20}
             metalness={springProps.metalnessD20}
             roughness={springProps.roughnessD20}
-            clearcoat={0.13}
+            clearcoat={0.73}
             clearcoatRoughness={0.4}
             color="silver"
           />
