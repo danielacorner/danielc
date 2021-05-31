@@ -39,13 +39,34 @@ const D20_STAR_ROTATION = {
 };
 
 // rotate the icosahedron to each face, from 20 to 1
-const SIDES_ROTATIONS = [
-  { x: degToRad(88.8), y: degToRad(224.4), z: degToRad(252) }, // 20
-  { x: degToRad(224.4), y: degToRad(144), z: degToRad(254.4) }, // 19
-  { x: degToRad(349.2), y: degToRad(163.2), z: degToRad(25.2) }, // 18
-  { x: degToRad(349.2), y: degToRad(163.2), z: degToRad(25.2) }, // 17
-  { x: degToRad(70.81), y: degToRad(0), z: degToRad(0) },
+const SIDES_ROTATIONS_DEG = [
+  { x: 88.8, y: 224.4, z: 252 }, // 20
+  { x: 224.4, y: 144, z: 254.4 }, // 19
+  { x: 349.2, y: 163.2, z: 25.2 }, // 18
+  { x: 309.6, y: 27.6, z: 296.4 }, // 17
+  { x: 349.2, y: 16.8, z: 33.6 }, // 16
+  { x: 129.6, y: 30, z: 108 }, // 15
+  { x: 66, y: 271.2, z: 271.2 }, // 14
+  { x: 42, y: 150, z: 66 }, // 13
+  { x: 50.4, y: 230.4, z: 152.4 }, // 12
+  { x: 240.4, y: 304.8, z: 146.4 }, // 11
+  { x: 230.4, y: 235.2, z: 326.4 }, // 10
+  { x: 230.4, y: 232.8, z: 146.4 }, // 9
+  { x: 42, y: 30, z: 252 }, // 8
+  { x: 42, y: 271.2, z: 63.6 }, // 7
+  { x: 302.4, y: 21.6, z: 118.8 }, // 6
+  { x: 163.2, y: 16.8, z: 30 }, // 5
+  { x: 307.2, y: 146.4, z: 110.4 }, // 4
+  { x: 340.8, y: 19.2, z: 213.6 }, // 3
+  { x: 224.4, y: 30, z: 69.6 }, // 2
+  { x: 268.8, y: 30, z: 246 }, // 1
 ];
+
+const SIDES_ROTATIONS = SIDES_ROTATIONS_DEG.map((xyz) =>
+  Object.fromEntries(
+    Object.entries(xyz).map(([x, degrees]) => [x, degToRad(degrees)])
+  )
+);
 
 export default function SpinningParticle() {
   const scalePct = 1;
@@ -74,10 +95,13 @@ export default function SpinningParticle() {
     min: 0,
     max: 360,
   });
-  const animationStep = useAnimationStep();
-  const isD20Active = animationStep > 1;
-  const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
-  // const rotation = useRotateWithScroll(x, y, z);
+
+  const isZoomed = useStore((s) => s.isZoomed);
+
+  const isD20Active = useIsD20Active();
+  // const rotation = { x: degToRad(x), y: degToRad(y), z: degToRad(z) };
+
+  useSpinObjects(ref1, ref2, ref3, ref4, ref5);
 
   // const opacity = useControl("opacity", { // ? not working
   //   value: 0.78,
@@ -97,10 +121,6 @@ export default function SpinningParticle() {
     min: 0.0,
     max: 1,
   });
-
-  const isZoomed = useStore((s) => s.isZoomed);
-
-  useSpinObjects(ref1, ref2, isZoomed, ref3, rotation, ref4, ref5);
 
   const [mounted, setMounted] = useState(false);
   useMount(() => {
@@ -272,12 +292,16 @@ export default function SpinningParticle() {
 function useSpinObjects(
   ref1: React.MutableRefObject<any>,
   ref2: React.MutableRefObject<any>,
-  isZoomed: boolean,
   ref3: React.MutableRefObject<any>,
-  rotation: { x: any; y: number; z: number },
   ref4: React.MutableRefObject<any>,
   ref5: React.MutableRefObject<any>
 ) {
+  const isZoomed = useStore((s) => s.isZoomed);
+  const isD20Active = useIsD20Active();
+  const rotation = useRotateWithScroll();
+
+  const speedRotate = isD20Active ? 0.08 : 0.05;
+
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
     if (!ref1.current) {
@@ -296,11 +320,14 @@ function useSpinObjects(
       // e.g. 5 -> 2
       // 5 = 5 + (2-5)/2
       ref3.current.rotation.x =
-        ref3.current.rotation.x + (rotation.x - ref3.current.rotation.x) / 20;
+        ref3.current.rotation.x +
+        (rotation.x - ref3.current.rotation.x) * speedRotate;
       ref3.current.rotation.y =
-        ref3.current.rotation.y + (rotation.y - ref3.current.rotation.y) / 20;
+        ref3.current.rotation.y +
+        (rotation.y - ref3.current.rotation.y) * speedRotate;
       ref3.current.rotation.z =
-        ref3.current.rotation.z + (rotation.z - ref3.current.rotation.z) / 20;
+        ref3.current.rotation.z +
+        (rotation.z - ref3.current.rotation.z) * speedRotate;
     } else {
       ref3.current.rotation.x = Math.sin(time * SPEED_Y) * AMPLITUDE_Y;
       ref3.current.rotation.y =
@@ -317,17 +344,20 @@ function useSpinObjects(
   });
 }
 
-function useRotateWithScroll(x, y, z) {
+function useRotateWithScroll() {
   const animationStep = useAnimationStep();
 
-  const [rotation, setRotation] = useState({
-    x: degToRad(x),
-    y: degToRad(y),
-    z: degToRad(z),
-  });
+  const [rotation, setRotation] = useState(SIDES_ROTATIONS[0]);
+
   useEffect(() => {
-    setRotation(SIDES_ROTATIONS[animationStep] || SIDES_ROTATIONS[0]);
+    setRotation(SIDES_ROTATIONS[animationStep - 1] || SIDES_ROTATIONS[0]);
   }, [animationStep]);
+
   console.log("🌟🚨 ~ SpinningParticle ~ animationStep", animationStep);
-  return rotation;
+  return rotation as { x: number; y: number; z: number };
+}
+
+function useIsD20Active() {
+  const animationStep = useAnimationStep();
+  return animationStep > 0;
 }
